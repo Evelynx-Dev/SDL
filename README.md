@@ -341,20 +341,20 @@ load kioto
 load sdl::sdl3
 
 pub fn main: () {
-    if !sdl3::init_video() {
-        log::error("SDL3 init failed: " + sdl3::get_error())
-        return
-    }
+ if !sdl3::init_video() {
+ log::error("SDL3 init failed: " + sdl3::get_error())
+ return
+ }
 
-    set win = sdl3::create_window("Hello Mire" 640 480)
-    set rend = sdl3::create_renderer(win)
+ set win = sdl3::create_window("Hello Mire" 640 480)
+ set rend = sdl3::create_renderer(win)
 
-    sdl3::fill_screen(rend 50 100 200)   # first buffer commit
-    sdl3::delay(3000)
+ sdl3::fill_screen(rend 50 100 200) # first buffer commit
+ sdl3::delay(3000)
 
-    sdl3::destroy_renderer(rend)
-    sdl3::destroy_window(win)
-    sdl3::quit()
+ sdl3::destroy_renderer(rend)
+ sdl3::destroy_window(win)
+ sdl3::quit()
 }
 ```
 
@@ -377,17 +377,17 @@ pub fn main: () {
 ## Design notes
 
 - **Wayland buffer commit**: Under Wayland, `SDL_CreateWindow` creates the
-  surface but the compositor only maps it after `SDL_RenderPresent` commits
-  the first buffer. Always call `fill_screen` (or `clear` + `present`) before
-  waiting or polling.
+ surface but the compositor only maps it after `SDL_RenderPresent` commits
+ the first buffer. Always call `fill_screen` (or `clear` + `present`) before
+ waiting or polling.
 - **`SDL_Delay` pumps Wayland events** but does NOT attach a buffer — `sleep+present`
-  loops must present first.
+ loops must present first.
 - **`:bool` vs `:i64` ABI**: SDL3 C API uses `_Bool` (1 byte in `al` register),
-  SDL2 uses `int` (4 bytes in `eax`). Return types must match exactly for
-  correct x86_64 calling convention.
+ SDL2 uses `int` (4 bytes in `eax`). Return types must match exactly for
+ correct x86_64 calling convention.
 - **Event buffer**: Pass a `i64` pointer (use Mire's `rt_alloc` for SDL_Event
-  struct, 128 bytes on x86_64). Event type and window event subtype read via
-  `rt_read_u32` / `rt_read_u8` helpers.
+ struct, 128 bytes on x86_64). Event type and window event subtype read via
+ `rt_read_u32` / `rt_read_u8` helpers.
 
 ## Version
 
