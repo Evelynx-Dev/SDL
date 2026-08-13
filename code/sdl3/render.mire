@@ -20,6 +20,19 @@ extern fn SDL_RenderFillRect: (renderer :i64, rect_ptr :i64) :bool lib "SDL3"
 extern fn SDL_RenderRect: (renderer :i64, rect_ptr :i64) :bool lib "SDL3"
 extern fn SDL_RenderLine: (renderer :i64, x1 :f64, y1 :f64, x2 :f64, y2 :f64) :bool lib "SDL3"
 extern fn SDL_RenderPoint: (renderer :i64, x :f64, y :f64) :bool lib "SDL3"
+extern fn SDL_RenderPoints: (renderer :i64, points_ptr :i64, count :i64) :bool lib "SDL3"
+extern fn SDL_RenderLines: (renderer :i64, points_ptr :i64, count :i64) :bool lib "SDL3"
+extern fn SDL_RenderGeometry: (renderer :i64, texture :i64, vertices_ptr :i64, num_vertices :i64, indices_ptr :i64, num_indices :i64) :bool lib "SDL3"
+
+extern fn SDL_LockTexture: (texture :i64, rect_ptr :i64, pixels_out_ptr :i64, pitch_out_ptr :i64) :bool lib "SDL3"
+extern fn SDL_UnlockTexture: (texture :i64) lib "SDL3"
+
+extern fn SDL_SetTextureColorMod: (texture :i64, r :i64, g :i64, b :i64) :bool lib "SDL3"
+extern fn SDL_GetTextureColorMod: (texture :i64, r :i64, g :i64, b :i64) :bool lib "SDL3"
+extern fn SDL_SetTextureAlphaMod: (texture :i64, a :i64) :bool lib "SDL3"
+extern fn SDL_GetTextureAlphaMod: (texture :i64, a :i64) :bool lib "SDL3"
+extern fn SDL_SetTextureBlendMode: (texture :i64, blend_mode :i64) :bool lib "SDL3"
+extern fn SDL_GetTextureBlendMode: (texture :i64, blend_mode :i64) :bool lib "SDL3"
 
 extern fn SDL_SetRenderViewport: (renderer :i64, rect_ptr :i64) :bool lib "SDL3"
 extern fn SDL_GetRenderViewport: (renderer :i64, rect_ptr :i64) :bool lib "SDL3"
@@ -43,6 +56,12 @@ extern fn SDL_GetCurrentRenderOutputSize: (renderer :i64, w :i64, h :i64) :bool 
 extern fn SDL_SetRenderTarget: (renderer :i64, texture :i64) :bool lib "SDL3"
 extern fn SDL_GetRenderTarget: (renderer :i64) :i64 lib "SDL3"
 
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+extern fn rt_write_u32: (ptr :i64, val :i64) lib "c"
+extern fn rt_write_u8: (ptr :i64, val :i64) lib "c"
+extern fn rt_read_u8: (ptr :i64) :i64 lib "c"
+
 pub fn texture_access_static: () :i64 { return 0 }
 pub fn texture_access_streaming: () :i64 { return 1 }
 pub fn texture_access_target: () :i64 { return 2 }
@@ -63,6 +82,80 @@ pub fn logical_presentation_stretch: () :i64 { return 1 }
 pub fn logical_presentation_letterbox: () :i64 { return 2 }
 pub fn logical_presentation_overscan: () :i64 { return 3 }
 pub fn logical_presentation_integer_scale: () :i64 { return 4 }
+
+pub fn color_white: () :i64 {
+    set c = rt_alloc_raw(4)
+    if c == 0 { return 0 }
+    rt_write_u8(c, 255)
+    rt_write_u8(c + 1, 255)
+    rt_write_u8(c + 2, 255)
+    rt_write_u8(c + 3, 255)
+    return c
+}
+
+pub fn color_red: () :i64 {
+    set c = rt_alloc_raw(4)
+    if c == 0 { return 0 }
+    rt_write_u8(c, 255)
+    rt_write_u8(c + 1, 0)
+    rt_write_u8(c + 2, 0)
+    rt_write_u8(c + 3, 255)
+    return c
+}
+
+pub fn color_green: () :i64 {
+    set c = rt_alloc_raw(4)
+    if c == 0 { return 0 }
+    rt_write_u8(c, 0)
+    rt_write_u8(c + 1, 255)
+    rt_write_u8(c + 2, 0)
+    rt_write_u8(c + 3, 255)
+    return c
+}
+
+pub fn color_blue: () :i64 {
+    set c = rt_alloc_raw(4)
+    if c == 0 { return 0 }
+    rt_write_u8(c, 0)
+    rt_write_u8(c + 1, 0)
+    rt_write_u8(c + 2, 255)
+    rt_write_u8(c + 3, 255)
+    return c
+}
+
+pub fn color_black: () :i64 {
+    set c = rt_alloc_raw(4)
+    if c == 0 { return 0 }
+    rt_write_u8(c, 0)
+    rt_write_u8(c + 1, 0)
+    rt_write_u8(c + 2, 0)
+    rt_write_u8(c + 3, 255)
+    return c
+}
+
+pub fn color_clear: () :i64 {
+    set c = rt_alloc_raw(4)
+    if c == 0 { return 0 }
+    rt_write_u8(c, 0)
+    rt_write_u8(c + 1, 0)
+    rt_write_u8(c + 2, 0)
+    rt_write_u8(c + 3, 0)
+    return c
+}
+
+pub fn color_destroy: (color_ptr :i64) {
+    if color_ptr != 0 { rt_free_raw(color_ptr) }
+}
+
+pub fn color_get_r: (color_ptr :i64) :i64 { return rt_read_u8(color_ptr) }
+pub fn color_get_g: (color_ptr :i64) :i64 { return rt_read_u8(color_ptr + 1) }
+pub fn color_get_b: (color_ptr :i64) :i64 { return rt_read_u8(color_ptr + 2) }
+pub fn color_get_a: (color_ptr :i64) :i64 { return rt_read_u8(color_ptr + 3) }
+
+pub fn color_set_r: (color_ptr :i64, r :i64) { rt_write_u8(color_ptr, r) }
+pub fn color_set_g: (color_ptr :i64, g :i64) { rt_write_u8(color_ptr + 1, g) }
+pub fn color_set_b: (color_ptr :i64, b :i64) { rt_write_u8(color_ptr + 2, b) }
+pub fn color_set_a: (color_ptr :i64, a :i64) { rt_write_u8(color_ptr + 3, a) }
 
 pub fn create_renderer: (win :i64) :i64 {
     return SDL_CreateRenderer(win 0)
@@ -109,8 +202,24 @@ pub fn fill_rect: (rend :i64, rect_ptr :i64) :bool {
     return SDL_RenderFillRect(rend rect_ptr)
 }
 
+pub fn fill_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :bool {
+    set rect = create_rect(x y w h)
+    if rect == 0 { return false }
+    set ok = SDL_RenderFillRect(rend rect)
+    destroy_rect(rect)
+    return ok
+}
+
 pub fn draw_rect: (rend :i64, rect_ptr :i64) :bool {
     return SDL_RenderRect(rend rect_ptr)
+}
+
+pub fn draw_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :bool {
+    set rect = create_rect(x y w h)
+    if rect == 0 { return false }
+    set ok = SDL_RenderRect(rend rect)
+    destroy_rect(rect)
+    return ok
 }
 
 pub fn draw_line: (rend :i64, x1 :f64, y1 :f64, x2 :f64, y2 :f64) :bool {
@@ -125,6 +234,14 @@ pub fn set_viewport: (rend :i64, rect_ptr :i64) :bool {
     return SDL_SetRenderViewport(rend rect_ptr)
 }
 
+pub fn set_viewport_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :bool {
+    set rect = create_rect(x y w h)
+    if rect == 0 { return false }
+    set ok = SDL_SetRenderViewport(rend rect)
+    destroy_rect(rect)
+    return ok
+}
+
 pub fn get_viewport: (rend :i64, rect_ptr :i64) :bool {
     return SDL_GetRenderViewport(rend rect_ptr)
 }
@@ -135,6 +252,14 @@ pub fn viewport_set: (rend :i64) :bool {
 
 pub fn set_clip_rect: (rend :i64, rect_ptr :i64) :bool {
     return SDL_SetRenderClipRect(rend rect_ptr)
+}
+
+pub fn set_clip_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :bool {
+    set rect = create_rect(x y w h)
+    if rect == 0 { return false }
+    set ok = SDL_SetRenderClipRect(rend rect)
+    destroy_rect(rect)
+    return ok
 }
 
 pub fn get_clip_rect: (rend :i64, rect_ptr :i64) :bool {
@@ -179,4 +304,148 @@ pub fn set_render_target: (rend :i64, tex :i64) :bool {
 
 pub fn get_render_target: (rend :i64) :i64 {
     return SDL_GetRenderTarget(rend)
+}
+
+pub fn create_rect: (x :i64, y :i64, w :i64, h :i64) :i64 {
+    set ptr = rt_alloc_raw(16)
+    if ptr == 0 { return 0 }
+    rt_write_u32(ptr, x)
+    rt_write_u32(ptr + 4, y)
+    rt_write_u32(ptr + 8, w)
+    rt_write_u32(ptr + 12, h)
+    return ptr
+}
+
+pub fn destroy_rect: (ptr :i64) {
+    if ptr != 0 { rt_free_raw(ptr) }
+}
+
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
+
+pub fn rect_get_x: (rect_ptr :i64) :i64 { return rt_read_u32(rect_ptr) }
+pub fn rect_get_y: (rect_ptr :i64) :i64 { return rt_read_u32(rect_ptr + 4) }
+pub fn rect_get_w: (rect_ptr :i64) :i64 { return rt_read_u32(rect_ptr + 8) }
+pub fn rect_get_h: (rect_ptr :i64) :i64 { return rt_read_u32(rect_ptr + 12) }
+
+pub fn rect_set_x: (rect_ptr :i64, x :i64) { rt_write_u32(rect_ptr, x) }
+pub fn rect_set_y: (rect_ptr :i64, y :i64) { rt_write_u32(rect_ptr + 4, y) }
+pub fn rect_set_w: (rect_ptr :i64, w :i64) { rt_write_u32(rect_ptr + 8, w) }
+pub fn rect_set_h: (rect_ptr :i64, h :i64) { rt_write_u32(rect_ptr + 12, h) }
+
+pub fn render_texture_xywh: (rend :i64, tex :i64, src_x :i64, src_y :i64, src_w :i64, src_h :i64, dst_x :i64, dst_y :i64, dst_w :i64, dst_h :i64) :bool {
+    set src = create_rect(src_x src_y src_w src_h)
+    if src == 0 { return false }
+    set dst = create_rect(dst_x dst_y dst_w dst_h)
+    if dst == 0 {
+        destroy_rect(src)
+        return false
+    }
+    set ok = SDL_RenderTexture(rend tex src dst)
+    destroy_rect(src)
+    destroy_rect(dst)
+    return ok
+}
+
+// ── Geometry rendering (SDL_RenderGeometry) ────────────────────────
+// SDL_Vertex is 32 bytes: position{f32 x, f32 y} color{f32 r,g,b,a} texcoord{f32 u, f32 v}
+
+pub fn vertex_size: () :i64 { return 32 }
+
+pub fn create_vertex: (x :f64, y :f64, r :f64, g :f64, b :f64, a :f64, u :f64, v :f64) :i64 {
+    set ptr = rt_alloc_raw(vertex_size())
+    if ptr == 0 { return 0 }
+    vertex_set_position(ptr, x, y)
+    vertex_set_color(ptr, r, g, b, a)
+    vertex_set_texcoord(ptr, u, v)
+    return ptr
+}
+
+pub fn vertex_set_position: (ptr :i64, x :f64, y :f64) {
+    rt_write_f32(ptr, x)
+    rt_write_f32(ptr + 4, y)
+}
+
+pub fn vertex_set_color: (ptr :i64, r :f64, g :f64, b :f64, a :f64) {
+    rt_write_f32(ptr + 8, r)
+    rt_write_f32(ptr + 12, g)
+    rt_write_f32(ptr + 16, b)
+    rt_write_f32(ptr + 20, a)
+}
+
+pub fn vertex_set_texcoord: (ptr :i64, u :f64, v :f64) {
+    rt_write_f32(ptr + 24, u)
+    rt_write_f32(ptr + 28, v)
+}
+
+pub fn render_geometry: (rend :i64, tex :i64, vertices_ptr :i64, num_vertices :i64) :bool {
+    return SDL_RenderGeometry(rend, tex, vertices_ptr, num_vertices, 0, 0)
+}
+
+// ── FPoint array helpers (for SDL_RenderPoints/Lines) ────────────
+// Each SDL_FPoint is 8 bytes: float x, float y
+
+pub fn fpoint_size: () :i64 { return 8 }
+
+pub fn create_fpoint: (x :f64, y :f64) :i64 {
+    set ptr = rt_alloc_raw(fpoint_size())
+    if ptr == 0 { return 0 }
+    rt_write_f32(ptr, x)
+    rt_write_f32(ptr + 4, y)
+    return ptr
+}
+
+pub fn render_points: (rend :i64, points_ptr :i64, count :i64) :bool {
+    return SDL_RenderPoints(rend, points_ptr, count)
+}
+
+pub fn render_lines: (rend :i64, points_ptr :i64, count :i64) :bool {
+    return SDL_RenderLines(rend, points_ptr, count)
+}
+
+// ── Texture lock/unlock for pixel-level access ─────────────────────
+// lock_texture: allocates output slots for pixels ptr and pitch, locks the texture,
+// and returns the pixel pointer via rt_read_ptr. Pass 0 for rect to lock entire texture.
+
+pub fn lock_texture: (tex :i64) :i64 {
+    set pixels_ptr = rt_alloc_raw(8)
+    set pitch_ptr = rt_alloc_raw(8)
+    set ok = SDL_LockTexture(tex, 0, pixels_ptr, pitch_ptr)
+    if !ok {
+        rt_free_raw(pixels_ptr)
+        rt_free_raw(pitch_ptr)
+        return 0
+    }
+    set pixel_data = rt_read_ptr(pixels_ptr)
+    rt_free_raw(pixels_ptr)
+    rt_free_raw(pitch_ptr)
+    return pixel_data
+}
+
+pub fn unlock_texture: (tex :i64) {
+    SDL_UnlockTexture(tex)
+}
+
+// ── Texture color/alpha/blend mod ───────────────────────────────────
+pub fn set_texture_color_mod: (tex :i64, r :i64, g :i64, b :i64) :bool {
+    return SDL_SetTextureColorMod(tex, r, g, b)
+}
+
+pub fn get_texture_color_mod: (tex :i64, r :i64, g :i64, b :i64) :bool {
+    return SDL_GetTextureColorMod(tex, r, g, b)
+}
+
+pub fn set_texture_alpha_mod: (tex :i64, a :i64) :bool {
+    return SDL_SetTextureAlphaMod(tex, a)
+}
+
+pub fn get_texture_alpha_mod: (tex :i64, a :i64) :bool {
+    return SDL_GetTextureAlphaMod(tex, a)
+}
+
+pub fn set_texture_blend_mode: (tex :i64, mode :i64) :bool {
+    return SDL_SetTextureBlendMode(tex, mode)
+}
+
+pub fn get_texture_blend_mode: (tex :i64, mode :i64) :bool {
+    return SDL_GetTextureBlendMode(tex, mode)
 }

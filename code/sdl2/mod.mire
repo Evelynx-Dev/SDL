@@ -1,5 +1,22 @@
 module sdl2
 
+load sdl::sdl2::video
+load sdl::sdl2::render
+load sdl::sdl2::events
+load sdl::sdl2::audio
+load sdl::sdl2::clipboard
+load sdl::sdl2::timer
+load sdl::sdl2::version
+load sdl::sdl2::power
+load sdl::sdl2::filesystem
+load sdl::sdl2::keyboard
+load sdl::sdl2::mouse
+load sdl::sdl2::messagebox
+load sdl::sdl2::system
+load sdl::sdl2::misc
+load sdl::sdl2::cpuinfo
+load sdl::sdl2::structs
+
 extern lib "SDL2"
 
 extern fn SDL_Init: (flags :i64) :i64 lib "SDL2"

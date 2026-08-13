@@ -4,7 +4,6 @@ extern lib "SDL2"
 
 extern fn SDL_CreateRenderer: (window :i64, index :i64, flags :i64) :i64 lib "SDL2"
 extern fn SDL_DestroyRenderer: (renderer :i64) lib "SDL2"
-extern fn SDL_GetRendererName: (renderer :i64) :str lib "SDL2"
 extern fn SDL_GetRendererInfo: (renderer :i64, info_ptr :i64) :i64 lib "SDL2"
 extern fn SDL_GetNumRenderDrivers: () :i64 lib "SDL2"
 
@@ -39,10 +38,15 @@ extern fn SDL_RenderGetScale: (renderer :i64, scale_x :f64, scale_y :f64) lib "S
 extern fn SDL_SetRenderDrawBlendMode: (renderer :i64, blend_mode :i64) :i64 lib "SDL2"
 extern fn SDL_GetRenderDrawBlendMode: (renderer :i64, blend_mode :i64) :i64 lib "SDL2"
 
-extern fn SDL_GetRenderOutputSize: (renderer :i64, w :i64, h :i64) :i64 lib "SDL2"
+extern fn SDL_GetRendererOutputSize: (renderer :i64, w :i64, h :i64) :i64 lib "SDL2"
 
 extern fn SDL_SetRenderTarget: (renderer :i64, texture :i64) :i64 lib "SDL2"
 extern fn SDL_GetRenderTarget: (renderer :i64) :i64 lib "SDL2"
+
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+extern fn rt_write_u32: (ptr :i64, val :i64) lib "c"
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
 
 pub fn texture_access_static: () :i64 { return 0 }
 pub fn texture_access_streaming: () :i64 { return 1 }
@@ -77,8 +81,6 @@ pub fn create_default_renderer: (win :i64) :i64 {
 }
 
 pub fn destroy_renderer: (rend :i64) { SDL_DestroyRenderer(rend) }
-
-pub fn get_renderer_name: (rend :i64) :str { return SDL_GetRendererName(rend) }
 
 pub fn get_renderer_info: (rend :i64, info_ptr :i64) :i64 { return SDL_GetRendererInfo(rend info_ptr) }
 
@@ -123,7 +125,45 @@ pub fn render_copy_ex: (rend :i64, tex :i64, src :i64, dst :i64, angle :f64, cen
 
 pub fn fill_rect: (rend :i64, rect_ptr :i64) :i64 { return SDL_RenderFillRect(rend rect_ptr) }
 
+pub fn fill_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :i64 {
+    set rect = create_rect(x y w h)
+    if rect == 0 { return -1 }
+    set ok = SDL_RenderFillRect(rend rect)
+    destroy_rect(rect)
+    return ok
+}
+
 pub fn draw_rect: (rend :i64, rect_ptr :i64) :i64 { return SDL_RenderDrawRect(rend rect_ptr) }
+
+pub fn draw_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :i64 {
+    set rect = create_rect(x y w h)
+    if rect == 0 { return -1 }
+    set ok = SDL_RenderDrawRect(rend rect)
+    destroy_rect(rect)
+    return ok
+}
+
+pub fn render_copy_xywh: (rend :i64, tex :i64, src_x :i64, src_y :i64, src_w :i64, src_h :i64, dst_x :i64, dst_y :i64, dst_w :i64, dst_h :i64) :i64 {
+    set src = create_rect(src_x src_y src_w src_h)
+    if src == 0 { return -1 }
+    set dst = create_rect(dst_x dst_y dst_w dst_h)
+    if dst == 0 {
+        destroy_rect(src)
+        return -1
+    }
+    set ok = SDL_RenderCopy(rend tex src dst)
+    destroy_rect(src)
+    destroy_rect(dst)
+    return ok
+}
+
+pub fn set_viewport_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :i64 {
+    set rect = create_rect(x y w h)
+    if rect == 0 { return -1 }
+    set ok = SDL_RenderSetViewport(rend rect)
+    destroy_rect(rect)
+    return ok
+}
 
 pub fn draw_line: (rend :i64, x1 :i64, y1 :i64, x2 :i64, y2 :i64) :i64 {
     return SDL_RenderDrawLine(rend x1 y1 x2 y2)
@@ -136,6 +176,14 @@ pub fn set_viewport: (rend :i64, rect_ptr :i64) :i64 { return SDL_RenderSetViewp
 pub fn get_viewport: (rend :i64, rect_ptr :i64) { SDL_RenderGetViewport(rend rect_ptr) }
 
 pub fn set_clip_rect: (rend :i64, rect_ptr :i64) :i64 { return SDL_RenderSetClipRect(rend rect_ptr) }
+
+pub fn set_clip_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :i64 {
+    set rect = create_rect(x y w h)
+    if rect == 0 { return -1 }
+    set ok = SDL_RenderSetClipRect(rend rect)
+    destroy_rect(rect)
+    return ok
+}
 
 pub fn get_clip_rect: (rend :i64, rect_ptr :i64) { SDL_RenderGetClipRect(rend rect_ptr) }
 
@@ -151,8 +199,32 @@ pub fn set_blend_mode: (rend :i64, mode :i64) :i64 { return SDL_SetRenderDrawBle
 
 pub fn get_blend_mode: (rend :i64, mode :i64) :i64 { return SDL_GetRenderDrawBlendMode(rend mode) }
 
-pub fn get_output_size: (rend :i64, w :i64, h :i64) :i64 { return SDL_GetRenderOutputSize(rend w h) }
+pub fn get_output_size: (rend :i64, w :i64, h :i64) :i64 { return SDL_GetRendererOutputSize(rend w h) }
 
 pub fn set_render_target: (rend :i64, tex :i64) :i64 { return SDL_SetRenderTarget(rend tex) }
 
 pub fn get_render_target: (rend :i64) :i64 { return SDL_GetRenderTarget(rend) }
+
+pub fn create_rect: (x :i64, y :i64, w :i64, h :i64) :i64 {
+    set ptr = rt_alloc_raw(16)
+    if ptr == 0 { return 0 }
+    rt_write_u32(ptr, x)
+    rt_write_u32(ptr + 4, y)
+    rt_write_u32(ptr + 8, w)
+    rt_write_u32(ptr + 12, h)
+    return ptr
+}
+
+pub fn destroy_rect: (ptr :i64) {
+    if ptr != 0 { rt_free_raw(ptr) }
+}
+
+pub fn rect_get_x: (rect_ptr :i64) :i64 { return rt_read_u32(rect_ptr) }
+pub fn rect_get_y: (rect_ptr :i64) :i64 { return rt_read_u32(rect_ptr + 4) }
+pub fn rect_get_w: (rect_ptr :i64) :i64 { return rt_read_u32(rect_ptr + 8) }
+pub fn rect_get_h: (rect_ptr :i64) :i64 { return rt_read_u32(rect_ptr + 12) }
+
+pub fn rect_set_x: (rect_ptr :i64, x :i64) { rt_write_u32(rect_ptr, x) }
+pub fn rect_set_y: (rect_ptr :i64, y :i64) { rt_write_u32(rect_ptr + 4, y) }
+pub fn rect_set_w: (rect_ptr :i64, w :i64) { rt_write_u32(rect_ptr + 8, w) }
+pub fn rect_set_h: (rect_ptr :i64, h :i64) { rt_write_u32(rect_ptr + 12, h) }

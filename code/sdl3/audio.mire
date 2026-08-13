@@ -10,10 +10,7 @@ extern fn SDL_CloseAudioDevice: (devid :i64) lib "SDL3"
 extern fn SDL_PauseAudioDevice: (devid :i64) :bool lib "SDL3"
 extern fn SDL_ResumeAudioDevice: (devid :i64) :bool lib "SDL3"
 extern fn SDL_AudioDevicePaused: (devid :i64) :bool lib "SDL3"
-extern fn SDL_QueueAudio: (devid :i64, data :i64, len :i64) :bool lib "SDL3"
-extern fn SDL_GetQueuedAudioSize: (devid :i64) :i64 lib "SDL3"
-extern fn SDL_ClearQueuedAudio: (devid :i64) lib "SDL3"
-extern fn SDL_MixAudio: (dst :i64, src :i64, len :i64, volume :f64) :bool lib "SDL3"
+extern fn SDL_MixAudio: (dst :i64, src :i64, format :i64, len :i64, volume :f64) :bool lib "SDL3"
 extern fn SDL_GetAudioDeviceFormat: (devid :i64, spec_ptr :i64, sample_frames :i64) :bool lib "SDL3"
 extern fn SDL_SetAudioDeviceGain: (devid :i64, gain :f64) :bool lib "SDL3"
 extern fn SDL_GetAudioDeviceGain: (devid :i64) :f64 lib "SDL3"
@@ -37,14 +34,8 @@ pub fn resume_device: (devid :i64) :bool { return SDL_ResumeAudioDevice(devid) }
 
 pub fn device_paused: (devid :i64) :bool { return SDL_AudioDevicePaused(devid) }
 
-pub fn queue_audio: (devid :i64, data :i64, len :i64) :bool { return SDL_QueueAudio(devid data len) }
-
-pub fn get_queued_audio_size: (devid :i64) :i64 { return SDL_GetQueuedAudioSize(devid) }
-
-pub fn clear_queued_audio: (devid :i64) { SDL_ClearQueuedAudio(devid) }
-
-pub fn mix_audio: (dst :i64, src :i64, len :i64, volume :f64) :bool {
-    return SDL_MixAudio(dst src len volume)
+pub fn mix_audio: (dst :i64, src :i64, format :i64, len :i64, volume :f64) :bool {
+    return SDL_MixAudio(dst src format len volume)
 }
 
 pub fn get_device_format: (devid :i64, spec_ptr :i64, sample_frames :i64) :bool {

@@ -1,0 +1,15 @@
+module power
+
+extern lib "SDL2"
+
+extern fn SDL_GetPowerInfo: (seconds :i64, percent :i64) :i64 lib "SDL2"
+
+pub fn state_unknown: () :i64 { return 0 }
+pub fn state_on_battery: () :i64 { return 1 }
+pub fn state_no_battery: () :i64 { return 2 }
+pub fn state_charging: () :i64 { return 3 }
+pub fn state_charged: () :i64 { return 4 }
+
+pub fn get_power_info: (seconds :i64, percent :i64) :i64 {
+    return SDL_GetPowerInfo(seconds, percent)
+}

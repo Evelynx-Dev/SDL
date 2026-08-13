@@ -23,7 +23,6 @@ extern fn SDL_SetWindowFullscreen: (window :i64, flags :i64) :i64 lib "SDL2"
 extern fn SDL_GetWindowFlags: (window :i64) :i64 lib "SDL2"
 extern fn SDL_GetWindowID: (window :i64) :i64 lib "SDL2"
 extern fn SDL_GetWindowFromID: (id :i64) :i64 lib "SDL2"
-extern fn SDL_GetWindowPixelDensity: (window :i64) :f64 lib "SDL2"
 
 extern fn SDL_GetNumVideoDisplays: () :i64 lib "SDL2"
 extern fn SDL_GetDisplayName: (index :i64) :str lib "SDL2"
@@ -95,8 +94,6 @@ pub fn get_window_flags: (win :i64) :i64 { return SDL_GetWindowFlags(win) }
 pub fn get_window_id: (win :i64) :i64 { return SDL_GetWindowID(win) }
 
 pub fn get_window_from_id: (id :i64) :i64 { return SDL_GetWindowFromID(id) }
-
-pub fn get_pixel_density: (win :i64) :f64 { return SDL_GetWindowPixelDensity(win) }
 
 pub fn get_num_displays: () :i64 { return SDL_GetNumVideoDisplays() }
 

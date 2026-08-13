@@ -1,0 +1,167 @@
+module keyboard
+
+extern lib "SDL3"
+
+extern fn SDL_HasKeyboard: () :bool lib "SDL3"
+extern fn SDL_GetKeyboards: (count :i64) :i64 lib "SDL3"
+extern fn SDL_GetKeyboardNameForID: (instance_id :i64) :str lib "SDL3"
+extern fn SDL_GetModState: () :i64 lib "SDL3"
+extern fn SDL_SetModState: (modstate :i64) lib "SDL3"
+extern fn SDL_GetKeyFromScancode: (scancode :i64, modstate :i64, key_event :bool) :i64 lib "SDL3"
+extern fn SDL_GetScancodeFromKey: (key :i64, modstate_ptr :i64) :i64 lib "SDL3"
+extern fn SDL_GetScancodeName: (scancode :i64) :str lib "SDL3"
+extern fn SDL_GetScancodeFromName: (name :str) :i64 lib "SDL3"
+extern fn SDL_GetKeyName: (key :i64) :str lib "SDL3"
+extern fn SDL_GetKeyFromName: (name :str) :i64 lib "SDL3"
+extern fn SDL_StartTextInput: (window :i64) :bool lib "SDL3"
+extern fn SDL_StopTextInput: (window :i64) :bool lib "SDL3"
+extern fn SDL_TextInputActive: (window :i64) :bool lib "SDL3"
+
+pub fn has_keyboard: () :bool {
+    return SDL_HasKeyboard()
+}
+
+pub fn get_keyboard_count: () :i64 {
+    return SDL_GetKeyboards(0)
+}
+
+pub fn get_keyboard_name: (id :i64) :str {
+    return SDL_GetKeyboardNameForID(id)
+}
+
+pub fn get_mod_state: () :i64 {
+    return SDL_GetModState()
+}
+
+pub fn set_mod_state: (state :i64) {
+    SDL_SetModState(state)
+}
+
+pub fn key_from_scancode: (scancode :i64, modstate :i64, key_event :bool) :i64 {
+    return SDL_GetKeyFromScancode(scancode, modstate, key_event)
+}
+
+pub fn scancode_from_key: (key :i64) :i64 {
+    return SDL_GetScancodeFromKey(key, 0)
+}
+
+pub fn get_scancode_name: (scancode :i64) :str {
+    return SDL_GetScancodeName(scancode)
+}
+
+pub fn get_scancode_from_name: (name :str) :i64 {
+    return SDL_GetScancodeFromName(name)
+}
+
+pub fn get_key_name: (key :i64) :str {
+    return SDL_GetKeyName(key)
+}
+
+pub fn get_key_from_name: (name :str) :i64 {
+    return SDL_GetKeyFromName(name)
+}
+
+// ── Text input ─────────────────────────────────────────────────────
+pub fn start_text_input: (win :i64) :bool {
+    return SDL_StartTextInput(win)
+}
+
+pub fn stop_text_input: (win :i64) :bool {
+    return SDL_StopTextInput(win)
+}
+
+pub fn is_text_input_active: (win :i64) :bool {
+    return SDL_TextInputActive(win)
+}
+
+pub fn mod_none: () :i64 { return 0x0000 }
+pub fn mod_left_shift: () :i64 { return 0x0001 }
+pub fn mod_right_shift: () :i64 { return 0x0002 }
+pub fn mod_left_ctrl: () :i64 { return 0x0040 }
+pub fn mod_right_ctrl: () :i64 { return 0x0080 }
+pub fn mod_left_alt: () :i64 { return 0x0100 }
+pub fn mod_right_alt: () :i64 { return 0x0200 }
+pub fn mod_shift: () :i64 { return 0x0003 }
+pub fn mod_ctrl: () :i64 { return 0x00C0 }
+pub fn mod_alt: () :i64 { return 0x0300 }
+
+// ── Key codes (SDLK_*) ─────────────────────────────────────────────
+// Printable ASCII characters
+pub fn key_a: () :i64 { return 0x00000061 }
+pub fn key_b: () :i64 { return 0x00000062 }
+pub fn key_c: () :i64 { return 0x00000063 }
+pub fn key_d: () :i64 { return 0x00000064 }
+pub fn key_e: () :i64 { return 0x00000065 }
+pub fn key_f: () :i64 { return 0x00000066 }
+pub fn key_g: () :i64 { return 0x00000067 }
+pub fn key_h: () :i64 { return 0x00000068 }
+pub fn key_i: () :i64 { return 0x00000069 }
+pub fn key_j: () :i64 { return 0x0000006a }
+pub fn key_k: () :i64 { return 0x0000006b }
+pub fn key_l: () :i64 { return 0x0000006c }
+pub fn key_m: () :i64 { return 0x0000006d }
+pub fn key_n: () :i64 { return 0x0000006e }
+pub fn key_o: () :i64 { return 0x0000006f }
+pub fn key_p: () :i64 { return 0x00000070 }
+pub fn key_q: () :i64 { return 0x00000071 }
+pub fn key_r: () :i64 { return 0x00000072 }
+pub fn key_s: () :i64 { return 0x00000073 }
+pub fn key_t: () :i64 { return 0x00000074 }
+pub fn key_u: () :i64 { return 0x00000075 }
+pub fn key_v: () :i64 { return 0x00000076 }
+pub fn key_w: () :i64 { return 0x00000077 }
+pub fn key_x: () :i64 { return 0x00000078 }
+pub fn key_y: () :i64 { return 0x00000079 }
+pub fn key_z: () :i64 { return 0x0000007a }
+pub fn key_0: () :i64 { return 0x00000030 }
+pub fn key_1: () :i64 { return 0x00000031 }
+pub fn key_2: () :i64 { return 0x00000032 }
+pub fn key_3: () :i64 { return 0x00000033 }
+pub fn key_4: () :i64 { return 0x00000034 }
+pub fn key_5: () :i64 { return 0x00000035 }
+pub fn key_6: () :i64 { return 0x00000036 }
+pub fn key_7: () :i64 { return 0x00000037 }
+pub fn key_8: () :i64 { return 0x00000038 }
+pub fn key_9: () :i64 { return 0x00000039 }
+pub fn key_space: () :i64 { return 0x00000020 }
+pub fn key_return: () :i64 { return 0x0000000d }
+pub fn key_backspace: () :i64 { return 0x00000008 }
+pub fn key_tab: () :i64 { return 0x00000009 }
+pub fn key_escape: () :i64 { return 0x0000001b }
+pub fn key_delete: () :i64 { return 0x0000007f }
+pub fn key_backslash: () :i64 { return 0x0000005c }
+pub fn key_backslash_shift: () :i64 { return 0x0000007c }
+pub fn key_backspace_del: () :i64 { return 0x0000007f }
+pub fn key_insert: () :i64 { return 0x40000222 }
+pub fn key_home: () :i64 { return 0x4000004a }
+pub fn key_end: () :i64 { return 0x4000004d }
+pub fn key_pageup: () :i64 { return 0x4000004b }
+pub fn key_pagedown: () :i64 { return 0x4000004e }
+pub fn key_left: () :i64 { return 0x40000050 }
+pub fn key_right: () :i64 { return 0x4000004f }
+pub fn key_up: () :i64 { return 0x40000052 }
+pub fn key_down: () :i64 { return 0x40000051 }
+pub fn key_f1: () :i64 { return 0x4000003a }
+pub fn key_f2: () :i64 { return 0x4000003b }
+pub fn key_f3: () :i64 { return 0x4000003c }
+pub fn key_f4: () :i64 { return 0x4000003d }
+pub fn key_f5: () :i64 { return 0x4000003e }
+pub fn key_f6: () :i64 { return 0x4000003f }
+pub fn key_f7: () :i64 { return 0x40000040 }
+pub fn key_f8: () :i64 { return 0x40000041 }
+pub fn key_f9: () :i64 { return 0x40000042 }
+pub fn key_f10: () :i64 { return 0x40000043 }
+pub fn key_f11: () :i64 { return 0x40000044 }
+pub fn key_f12: () :i64 { return 0x40000045 }
+pub fn key_colon: () :i64 { return 0x0000003a }
+pub fn key_semicolon: () :i64 { return 0x0000003b }
+pub fn key_comma: () :i64 { return 0x0000002c }
+pub fn key_period: () :i64 { return 0x0000002e }
+pub fn key_slash: () :i64 { return 0x0000002f }
+pub fn key_plus: () :i64 { return 0x0000003d }
+pub fn key_minus: () :i64 { return 0x0000002d }
+pub fn key_equals: () :i64 { return 0x0000003d }
+pub fn key_leftbracket: () :i64 { return 0x0000005b }
+pub fn key_rightbracket: () :i64 { return 0x0000005d }
+pub fn key_quote: () :i64 { return 0x00000027 }
+pub fn key_backquote: () :i64 { return 0x00000060 }

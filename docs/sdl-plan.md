@@ -9,24 +9,26 @@ sdl/
  owl.toml # Owl project, exports via [paths].sources = "code"
  code/
  mod.mire # empty (minimal entry point)
- sdl3/
- owl.toml # exports: events, render, video, audio, clipboard, timer
- mod.mire # core: init, quit, get_error, delay, hints
- events.mire # poll_event, wait_event, push_event, event type constants
- render.mire # create/destroy renderer + textures, fill_rect, line, point, viewport, clip, scale, blend
- video.mire # window creation, title, size, fullscreen, position, show/hide, display queries
- audio.mire # open/close device, queue/clear audio, pause/resume, gain
- clipboard.mire # set/get clipboard text and primary selection
- timer.mire # get_ticks, performance counter/frequency, delay_ns
+  sdl3/
+  owl.toml # exports: events, render, video, audio, clipboard, timer, version, power, filesystem, keyboard, mouse, messagebox, system, misc, cpuinfo, structs
+  mod.mire # core: init, quit, get_error, delay, hints
+  events.mire # poll_event, wait_event, push_event, event type constants
+  render.mire # create/destroy renderer + textures, fill_rect, line, point, viewport, clip, scale, blend + color helpers + rect helpers + xywh wrappers
+  video.mire # window creation, title, size, fullscreen, position, show/hide, display queries
+  audio.mire # open/close device, queue/clear audio, pause/resume, gain
+  clipboard.mire # set/get clipboard text and primary selection
+  timer.mire # get_ticks, performance counter/frequency, delay_ns
+  structs.mire # SDL3 Rect/FRect/Point/FPoint/Color alloc + get/set helpers + destroy
  sdl2/
  owl.toml # exports: events, render, video, audio, clipboard, timer
  mod.mire # core SDL2: init, quit, get_error, delay, hints
  events.mire # SDL2 PollEvent, WaitEvent, PushEvent
  render.mire # SDL2 RenderCopy (no RenderTexture), set/get viewport, clip, scale
  video.mire # SDL2 CreateWindow with x/y params, fullscreen via flags
- audio.mire # SDL2 OpenAudioDevice (capture param), QueueAudio
- clipboard.mire # SDL2 clipboard (no primary selection)
- timer.mire # SDL2 GetTicks64, GetPerformanceCounter/Frequency
+  audio.mire # SDL2 OpenAudioDevice (capture param), QueueAudio
+  clipboard.mire # SDL2 clipboard (no primary selection)
+  timer.mire # SDL2 GetTicks64, GetPerformanceCounter/Frequency
+  structs.mire # SDL_Rect/SDL_Point alloc + get/set helpers + destroy
  bin/
  tests/
  docs/

@@ -1,0 +1,74 @@
+module cpuinfo
+
+extern lib "SDL3"
+
+extern fn SDL_GetNumLogicalCPUCores: () :i64 lib "SDL3"
+extern fn SDL_GetSystemRAM: () :i64 lib "SDL3"
+extern fn SDL_GetCPUCacheLineSize: () :i64 lib "SDL3"
+extern fn SDL_GetSystemPageSize: () :i64 lib "SDL3"
+extern fn SDL_HasMMX: () :bool lib "SDL3"
+extern fn SDL_HasSSE: () :bool lib "SDL3"
+extern fn SDL_HasSSE2: () :bool lib "SDL3"
+extern fn SDL_HasSSE3: () :bool lib "SDL3"
+extern fn SDL_HasSSE41: () :bool lib "SDL3"
+extern fn SDL_HasSSE42: () :bool lib "SDL3"
+extern fn SDL_HasAVX: () :bool lib "SDL3"
+extern fn SDL_HasAVX2: () :bool lib "SDL3"
+extern fn SDL_HasAVX512F: () :bool lib "SDL3"
+extern fn SDL_HasNEON: () :bool lib "SDL3"
+
+pub fn get_num_logical_cpu_cores: () :i64 {
+    return SDL_GetNumLogicalCPUCores()
+}
+
+pub fn get_num_system_ram: () :i64 {
+    return SDL_GetSystemRAM()
+}
+
+pub fn get_cpu_cache_line_size: () :i64 {
+    return SDL_GetCPUCacheLineSize()
+}
+
+pub fn get_system_page_size: () :i64 {
+    return SDL_GetSystemPageSize()
+}
+
+pub fn has_mmx: () :bool {
+    return SDL_HasMMX()
+}
+
+pub fn has_sse: () :bool {
+    return SDL_HasSSE()
+}
+
+pub fn has_sse2: () :bool {
+    return SDL_HasSSE2()
+}
+
+pub fn has_sse3: () :bool {
+    return SDL_HasSSE3()
+}
+
+pub fn has_sse41: () :bool {
+    return SDL_HasSSE41()
+}
+
+pub fn has_sse42: () :bool {
+    return SDL_HasSSE42()
+}
+
+pub fn has_avx: () :bool {
+    return SDL_HasAVX()
+}
+
+pub fn has_avx2: () :bool {
+    return SDL_HasAVX2()
+}
+
+pub fn has_avx512f: () :bool {
+    return SDL_HasAVX512F()
+}
+
+pub fn has_neon: () :bool {
+    return SDL_HasNEON()
+}

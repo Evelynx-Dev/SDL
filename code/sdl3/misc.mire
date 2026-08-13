@@ -1,0 +1,9 @@
+module misc
+
+extern lib "SDL3"
+
+extern fn SDL_OpenURL: (url :str) :bool lib "SDL3"
+
+pub fn open_url: (url :str) :bool {
+    return SDL_OpenURL(url)
+}

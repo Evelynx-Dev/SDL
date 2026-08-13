@@ -1,0 +1,14 @@
+module system
+
+extern lib "SDL2"
+
+extern fn SDL_GetPlatform: () :str lib "SDL2"
+extern fn SDL_LinuxSetThreadPriority: (thread_id :i64, priority :i64) :i64 lib "SDL2"
+
+pub fn get_platform: () :str {
+    return SDL_GetPlatform()
+}
+
+pub fn set_linux_thread_priority: (thread_id :i64, priority :i64) :i64 {
+    return SDL_LinuxSetThreadPriority(thread_id, priority)
+}

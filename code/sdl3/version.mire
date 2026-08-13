@@ -1,0 +1,20 @@
+module version
+
+extern lib "SDL3"
+
+extern fn SDL_GetVersion: () :i64 lib "SDL3"
+extern fn SDL_GetRevision: () :str lib "SDL3"
+
+pub fn get_version: () :i64 {
+    return SDL_GetVersion()
+}
+
+pub fn get_revision: () :str {
+    return SDL_GetRevision()
+}
+
+pub fn major: (v :i64) :i64 { return v / 1000000 }
+
+pub fn minor: (v :i64) :i64 { return (v / 1000) % 1000 }
+
+pub fn patch: (v :i64) :i64 { return v % 1000 }

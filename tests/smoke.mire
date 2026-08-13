@@ -1,6 +1,6 @@
 load kioto
 
-// !cfg::test
+@[test]
 pub fn test_smoke: () :bool {
     return true
 }

@@ -1,0 +1,69 @@
+module cpuinfo
+
+extern lib "SDL2"
+
+extern fn SDL_GetCPUCount: () :i64 lib "SDL2"
+extern fn SDL_GetSystemRAM: () :i64 lib "SDL2"
+extern fn SDL_GetCPUCacheLineSize: () :i64 lib "SDL2"
+extern fn SDL_HasMMX: () :i64 lib "SDL2"
+extern fn SDL_HasSSE: () :i64 lib "SDL2"
+extern fn SDL_HasSSE2: () :i64 lib "SDL2"
+extern fn SDL_HasSSE3: () :i64 lib "SDL2"
+extern fn SDL_HasSSE41: () :i64 lib "SDL2"
+extern fn SDL_HasSSE42: () :i64 lib "SDL2"
+extern fn SDL_HasAVX: () :i64 lib "SDL2"
+extern fn SDL_HasAVX2: () :i64 lib "SDL2"
+extern fn SDL_HasAVX512F: () :i64 lib "SDL2"
+extern fn SDL_HasNEON: () :i64 lib "SDL2"
+
+pub fn get_cpu_count: () :i64 {
+    return SDL_GetCPUCount()
+}
+
+pub fn get_num_system_ram: () :i64 {
+    return SDL_GetSystemRAM()
+}
+
+pub fn get_cpu_cache_line_size: () :i64 {
+    return SDL_GetCPUCacheLineSize()
+}
+
+pub fn has_mmx: () :i64 {
+    return SDL_HasMMX()
+}
+
+pub fn has_sse: () :i64 {
+    return SDL_HasSSE()
+}
+
+pub fn has_sse2: () :i64 {
+    return SDL_HasSSE2()
+}
+
+pub fn has_sse3: () :i64 {
+    return SDL_HasSSE3()
+}
+
+pub fn has_sse41: () :i64 {
+    return SDL_HasSSE41()
+}
+
+pub fn has_sse42: () :i64 {
+    return SDL_HasSSE42()
+}
+
+pub fn has_avx: () :i64 {
+    return SDL_HasAVX()
+}
+
+pub fn has_avx2: () :i64 {
+    return SDL_HasAVX2()
+}
+
+pub fn has_avx512f: () :i64 {
+    return SDL_HasAVX512F()
+}
+
+pub fn has_neon: () :i64 {
+    return SDL_HasNEON()
+}

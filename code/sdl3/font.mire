@@ -1,0 +1,195 @@
+module font
+
+extern lib "SDL3"
+
+// ── C runtime helpers ──────────────────────────────────────────────
+extern fn rt_font_get_pixel: (ch :i64, col :i64, row :i64) :i64 lib "c"
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+extern fn rt_write_u32: (ptr :i64, val :i64) lib "c"
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
+extern fn rt_blend_u32: (ptr :i64, color :i64, alpha :i64) lib "c"
+extern fn rt_read_ptr: (ptr :i64) :i64 lib "c"
+extern fn rt_strings_len: (s :&str) :i64 lib "c"
+extern fn rt_strings_len_utf8: (s :&str) :i64 lib "c"
+extern fn rt_font_char_at: (s :&str, i :i64) :i64 lib "c"
+extern fn rt_font_char_len: (s :&str, i :i64) :i64 lib "c"
+
+// ── SDL3 functions ───────────────────────────────────────────────────
+extern fn SDL_LockTexture: (tex :i64, rect_ptr :i64, pixels_out :i64, pitch_out :i64) :bool lib "SDL3"
+extern fn SDL_UnlockTexture: (tex :i64) lib "SDL3"
+
+// ── Geometry ───────────────────────────────────────────────────────
+cons FONT_W = 5 :i64
+cons FONT_H = 7 :i64
+
+pub fn font_w: () :i64 { return 5 }
+pub fn font_h: () :i64 { return 7 }
+
+// ── Color ───────────────────────────────────────────────────────────
+// Encode RGBA as u32 (little-endian: R, G, B, A) — SDL3 RGBA8888.
+pub fn color_to_u32: (r :i64, g :i64, b :i64, a :i64) :i64 {
+    return (r & 0xFF) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24)
+}
+
+// ── Text measurement ───────────────────────────────────────────────
+// spacing: extra horizontal gap between characters; scale: integer glyph scale.
+pub fn text_width: (text :&str, spacing :i64, scale :i64) :i64 {
+    return rt_strings_len_utf8(text) * ((5 + spacing) * scale)
+}
+
+// ── Texture helpers ────────────────────────────────────────────────
+pub fn lock_texture_full: (tex :i64, pitch_out :i64) :i64 {
+    set pixels_out = rt_alloc_raw(8)
+    set ok = SDL_LockTexture(tex, 0, pixels_out, pitch_out)
+    if !ok {
+        rt_free_raw(pixels_out)
+        return 0
+    }
+    set pixel_data = rt_read_ptr(pixels_out)
+    rt_free_raw(pixels_out)
+    return pixel_data
+}
+
+pub fn unlock_texture: (tex :i64) {
+    SDL_UnlockTexture(tex)
+}
+
+// Fill entire texture buffer with a color.
+pub fn fill_buffer: (buf :i64, buf_w :i64, buf_h :i64, color :i64) {
+    set total = buf_w * buf_h
+    set i = 0 :i64 mut
+    while i < total {
+        rt_write_u32(buf + i * 4, color)
+        set i = i + 1
+    }
+}
+
+// ── Filled rect helpers (all clamped + clip-aware) ────────────────
+// Draw a filled rect, optionally alpha-blended (for shadows).
+
+pub fn fill_rect: (buf :i64, buf_w :i64, x :i64, y :i64, w :i64, h :i64, color :i64, clip_x :i64, clip_y :i64, clip_w :i64, clip_h :i64) {
+    if buf == 0 || w <= 0 || h <= 0 { return }
+    set x1 = x + w :i64 mut
+    set y1 = y + h :i64 mut
+    if x < clip_x { set x = clip_x }
+    if y < clip_y { set y = clip_y }
+    if x1 > clip_x + clip_w { set x1 = clip_x + clip_w }
+    if y1 > clip_y + clip_h { set y1 = clip_y + clip_h }
+    if x < 0 { set x = 0 }
+    if y < 0 { set y = 0 }
+    if x1 > buf_w { set x1 = buf_w }
+    set yy = y :i64 mut
+    while yy < y1 {
+        set row = buf + yy * buf_w * 4
+        set xx = x :i64 mut
+        while xx < x1 {
+            rt_write_u32(row + xx * 4, color)
+            set xx = xx + 1
+        }
+        set yy = yy + 1
+    }
+}
+
+pub fn fill_rect_blend: (buf :i64, buf_w :i64, x :i64, y :i64, w :i64, h :i64, color :i64, alpha :i64, clip_x :i64, clip_y :i64, clip_w :i64, clip_h :i64) {
+    if buf == 0 || w <= 0 || h <= 0 || alpha <= 0 { return }
+    set x1 = x + w :i64 mut
+    set y1 = y + h :i64 mut
+    if x < clip_x { set x = clip_x }
+    if y < clip_y { set y = clip_y }
+    if x1 > clip_x + clip_w { set x1 = clip_x + clip_w }
+    if y1 > clip_y + clip_h { set y1 = clip_y + clip_h }
+    if x < 0 { set x = 0 }
+    if y < 0 { set y = 0 }
+    if x1 > buf_w { set x1 = buf_w }
+    set yy = y :i64 mut
+    while yy < y1 {
+        set row = buf + yy * buf_w * 4
+        set xx = x :i64 mut
+        while xx < x1 {
+            rt_blend_u32(row + xx * 4, color, alpha)
+            set xx = xx + 1
+        }
+        set yy = yy + 1
+    }
+}
+
+// ── Text rendering (scale + clip aware) ────────────────────────────
+// scale: each 5x7 pixel becomes a scale×scale block; edge pixels are
+// alpha-blended for a softer look. All drawing clipped to the rect.
+
+cons EDGE_A = 160 :i64
+
+pub fn draw_char_to_buffer: (buf :i64, buf_w :i64, x :i64, y :i64, ch :i64, color :i64, scale :i64, clip_x :i64, clip_y :i64, clip_w :i64, clip_h :i64) {
+    if buf == 0 || scale < 1 { return }
+    set cc = 0 :i64 mut
+    while cc < 5 {
+        set rr = 0 :i64 mut
+        while rr < 7 {
+            if rt_font_get_pixel(ch, cc, rr) == 1 {
+                set bx = x + cc * scale :i64 mut
+                set by = y + rr * scale :i64 mut
+                set sx = 0 :i64 mut
+                while sx < scale {
+                    set sy = 0 :i64 mut
+                    while sy < scale {
+                        set px = bx + sx
+                        set py = by + sy
+                        if px >= clip_x && px < clip_x + clip_w && py >= clip_y && py < clip_y + clip_h &&
+                           px >= 0 && px < buf_w && py >= 0 {
+                            set off = (py * buf_w + px) * 4
+                            if sx == 0 && sy == 0 {
+                                rt_write_u32(buf + off, color)
+                            } else {
+                                rt_blend_u32(buf + off, color, 160)
+                            }
+                        }
+                        set sy = sy + 1
+                    }
+                    set sx = sx + 1
+                }
+            }
+            set rr = rr + 1
+        }
+        set cc = cc + 1
+    }
+}
+
+pub fn draw_text_to_buffer: (buf :i64, buf_w :i64, x :i64, y :i64, text :&str, spacing :i64, scale :i64, color :i64, clip_x :i64, clip_y :i64, clip_w :i64, clip_h :i64) {
+    if text == "" { return }
+    set i = 0 :i64 mut
+    set cx = x :i64 mut
+    while i < rt_strings_len(text) {
+        set ch = rt_font_char_at(text, i)
+        if ch != 0 {
+            draw_char_to_buffer(buf, buf_w, cx, y, ch, color, scale, clip_x, clip_y, clip_w, clip_h)
+        }
+        set cx = cx + (5 + spacing) * scale
+        set i = i + rt_font_char_len(text, i)
+    }
+}
+
+// Cursor highlight at codepoint col_idx, then text. Both clipped.
+pub fn draw_text_with_cursor: (buf :i64, buf_w :i64, x :i64, y :i64, text :&str, col_idx :i64, spacing :i64, scale :i64, color :i64, cursor_color :i64, clip_x :i64, clip_y :i64, clip_w :i64, clip_h :i64) {
+    set i = 0 :i64 mut
+    set ci = 0 :i64 mut
+    set cx = x :i64 mut
+    set n = rt_strings_len(text)
+    set cw = (5 + spacing) * scale :i64 mut
+    set chh = 7 * scale :i64 mut
+    while i < n {
+        if ci == col_idx {
+            fill_rect(buf, buf_w, cx, y, cw, chh, cursor_color, clip_x, clip_y, clip_w, clip_h)
+        }
+        set ch = rt_font_char_at(text, i)
+        if ch != 0 {
+            draw_char_to_buffer(buf, buf_w, cx, y, ch, color, scale, clip_x, clip_y, clip_w, clip_h)
+        }
+        set cx = cx + cw
+        set i = i + rt_font_char_len(text, i)
+        set ci = ci + 1
+    }
+    if col_idx >= ci {
+        fill_rect(buf, buf_w, cx, y, cw, chh, cursor_color, clip_x, clip_y, clip_w, clip_h)
+    }
+}

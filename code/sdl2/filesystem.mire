@@ -1,0 +1,14 @@
+module filesystem
+
+extern lib "SDL2"
+
+extern fn SDL_GetBasePath: () :str lib "SDL2"
+extern fn SDL_GetPrefPath: (org :str, app :str) :str lib "SDL2"
+
+pub fn get_base_path: () :str {
+    return SDL_GetBasePath()
+}
+
+pub fn get_pref_path: (org :str, app :str) :str {
+    return SDL_GetPrefPath(org, app)
+}

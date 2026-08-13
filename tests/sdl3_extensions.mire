@@ -1,0 +1,160 @@
+load kioto
+load sdl::sdl3
+
+pub fn make_event_buf: () :i64 {
+    return rt_alloc_raw(128)
+}
+
+@[test]
+pub fn test_init_constants: () :bool {
+    return sdl3::init_timer() == 0x00000001 &&
+           sdl3::init_audio() == 0x00000010 &&
+           sdl3::init_video() == 0x00000020 &&
+           sdl3::init_joystick() == 0x00000200 &&
+           sdl3::init_gamepad() == 0x00002000 &&
+           sdl3::init_events() == 0x00004000
+}
+
+@[test]
+pub fn test_key_code_constants: () :bool {
+    return keyboard::key_a() == 0x61 &&
+           keyboard::key_b() == 0x62 &&
+           keyboard::key_space() == 0x20 &&
+           keyboard::key_return() == 0x0D &&
+           keyboard::key_escape() == 0x1B &&
+           keyboard::key_f1() == 0x4000003a
+}
+
+@[test]
+pub fn test_mod_state_constants: () :bool {
+    return keyboard::mod_none() == 0x0000 &&
+           keyboard::mod_left_shift() == 0x0001 &&
+           keyboard::mod_right_shift() == 0x0002 &&
+           keyboard::mod_left_ctrl() == 0x0040 &&
+           keyboard::mod_right_ctrl() == 0x0080 &&
+           keyboard::mod_alt() == 0x0300
+}
+
+@[test]
+pub fn test_window_event_type: () :bool {
+    return events::window_event_shown() == 0x202 &&
+           events::window_event_hidden() == 0x203 &&
+           events::window_event_exposed() == 0x204 &&
+           events::window_event_moved() == 0x205 &&
+           events::window_event_resized() == 0x206 &&
+           events::window_event_pixel_size_changed() == 0x207 &&
+           events::window_event_minimized() == 0x209 &&
+           events::window_event_maximized() == 0x20A &&
+           events::window_event_restored() == 0x20B &&
+           events::window_event_focus_gained() == 0x20E &&
+           events::window_event_focus_lost() == 0x20F &&
+           events::window_event_close_requested() == 0x210
+}
+
+@[test]
+pub fn test_event_type_constants: () :bool {
+    return events::event_type_quit() == 0x100 &&
+           events::event_type_key_down() == 0x300 &&
+           events::event_type_key_up() == 0x301 &&
+           events::event_type_text_input() == 0x303 &&
+           events::event_type_text_editing() == 0x304 &&
+           events::event_type_mouse_motion() == 0x400 &&
+           events::event_type_mouse_button_down() == 0x401
+}
+
+@[test]
+pub fn test_event_field_readers: () :bool {
+    set buf = make_event_buf()
+    set type_val = 0x300 :i64
+    rt_write_i32(buf, type_val)
+    set read_back = rt_read_i32(buf)
+    return read_back == type_val
+}
+
+@[test]
+pub fn test_event_field_readers_u32: () :bool {
+    set buf = make_event_buf()
+    set val = 0xDEADBEEF :i64
+    rt_write_i32(buf, val)
+    set read_back = rt_read_u32(buf)
+    return read_back == val
+}
+
+@[test]
+pub fn test_event_field_readers_u16: () :bool {
+    set buf = make_event_buf()
+    rt_write_i32(buf, 0x00004000)
+    set et = rt_read_u16(buf)
+    set ws = rt_read_u16(buf + 2)
+    return et == 0x4000 && ws == 0
+}
+
+@[test]
+pub fn test_struct_creation: () :bool {
+    set r = render::create_rect(0, 0, 640, 480)
+    if r == 0 { return false }
+    set ok = render::rect_get_x(r) == 0 && render::rect_get_y(r) == 0 &&
+             render::rect_get_w(r) == 640 && render::rect_get_h(r) == 480
+    render::destroy_rect(r)
+    return ok
+}
+
+@[test]
+pub fn test_color_creation: () :bool {
+    set c = render::color_red()
+    if c == 0 { return false }
+    set ok = render::color_get_r(c) == 255 &&
+             render::color_get_g(c) == 0 &&
+             render::color_get_b(c) == 0 &&
+             render::color_get_a(c) == 255
+    render::color_destroy(c)
+    return ok
+}
+
+@[test]
+pub fn test_vertex_creation: () :bool {
+    set v = render::create_vertex(10.0, 20.0, 1.0, 0.0, 0.0, 1.0, 0.5, 0.5)
+    if v == 0 { return false }
+    set vx = rt_read_f32(v)
+    set vy = rt_read_f32(v + 4)
+    rt_free_raw(v)
+    return vx == 10.0 && vy == 20.0
+}
+
+@[test]
+pub fn test_vertex_size: () :bool {
+    return render::vertex_size() == 32
+}
+
+@[test]
+pub fn test_render_constants: () :bool {
+    return render::texture_access_static() == 0 &&
+           render::texture_access_streaming() == 1 &&
+           render::pixel_format_rgba8888() == 372645892 &&
+           render::blend_mode_none() == 0 &&
+           render::blend_mode_blend() == 1
+}
+
+@[test]
+pub fn test_init_events_headless: () :bool {
+    if !sdl3::init(0x00004000) {
+        return false
+    }
+
+    set buf = make_event_buf()
+    set has_events = events::poll_event(buf)
+    sdl3::quit()
+
+    return true
+}
+
+@[test]
+pub fn test_set_get_hint_with_init: () :bool {
+    if !sdl3::init(0x00000001) {
+        return false
+    }
+    set ok = sdl3::set_hint("SDL_HINT_RENDER_VSYNC" "0")
+    set val = sdl3::get_hint("SDL_HINT_RENDER_VSYNC")
+    sdl3::quit()
+    return ok && val == "0"
+}

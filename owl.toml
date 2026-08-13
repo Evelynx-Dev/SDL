@@ -1,6 +1,6 @@
 [project]
 name = "sdl"
-version = "1.0.1"
+version = "1.2.0"
 description = "SDL bindings for Mire (SDL2 + SDL3)"
 entry = "code/mod.mire"
 
@@ -14,6 +14,9 @@ sources = "code"
 tests = "tests"
 output = "bin"
 cache = "bin/.cache"
+
+[dependencies]
+sdl = { path = "." }
 
 [exports]
 sdl3 = "code/sdl3"

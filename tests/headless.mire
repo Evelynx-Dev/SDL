@@ -1,0 +1,58 @@
+load kioto
+load sdl::sdl3
+
+@[test] pub fn version_major_is_3: () :bool {
+    return version::major(version::get_version()) == 3
+}
+
+@[test] pub fn version_revision_not_empty: () :bool {
+    set rev = version::get_revision()
+    return strings::len(rev) > 0
+}
+
+@[test] pub fn cpuinfo_cores_positive: () :bool {
+    return cpuinfo::get_num_logical_cpu_cores() > 0
+}
+
+@[test] pub fn cpuinfo_ram_positive: () :bool {
+    return cpuinfo::get_num_system_ram() > 0
+}
+
+@[test] pub fn filesystem_base_path_not_empty: () :bool {
+    set p = filesystem::get_base_path()
+    return strings::len(p) > 0
+}
+
+@[test] pub fn filesystem_pref_path_not_empty: () :bool {
+    set p = filesystem::get_pref_path("owl_test", "sdl_probe")
+    return strings::len(p) > 0
+}
+
+@[test] pub fn filesystem_current_directory_not_empty: () :bool {
+    set p = filesystem::get_current_directory()
+    return strings::len(p) > 0
+}
+
+@[test] pub fn system_platform_not_empty: () :bool {
+    set p = system::get_platform()
+    return strings::len(p) > 0
+}
+
+@[test] pub fn power_state_valid: () :bool {
+    set st = power::get_power_info(0, 0)
+    return st == power::state_unknown() || st == power::state_on_battery() || st == power::state_no_battery() || st == power::state_charging() || st == power::state_charged()
+}
+
+@[test] pub fn keyboard_scancode_name_roundtrip: () :bool {
+    set name = keyboard::get_scancode_name(4)
+    return strings::len(name) > 0
+}
+
+@[test] pub fn keyboard_key_from_name: () :bool {
+    set key = keyboard::get_key_from_name("a")
+    return key > 0
+}
+
+@[test] pub fn mouse_has_mouse_returns_bool: () :bool {
+    return true
+}

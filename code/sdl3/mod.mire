@@ -1,5 +1,23 @@
 module sdl3
 
+load sdl::sdl3::video
+load sdl::sdl3::render
+load sdl::sdl3::events
+load sdl::sdl3::audio
+load sdl::sdl3::clipboard
+load sdl::sdl3::timer
+load sdl::sdl3::version
+load sdl::sdl3::power
+load sdl::sdl3::filesystem
+load sdl::sdl3::keyboard
+load sdl::sdl3::mouse
+load sdl::sdl3::messagebox
+load sdl::sdl3::system
+load sdl::sdl3::misc
+load sdl::sdl3::cpuinfo
+load sdl::sdl3::structs
+load sdl::sdl3::font
+
 extern lib "SDL3"
 
 extern fn SDL_Init: (flags :i64) :bool lib "SDL3"
@@ -12,9 +30,18 @@ extern fn SDL_GetTicksNS: () :i64 lib "SDL3"
 extern fn SDL_SetHint: (name :str, value :str) :bool lib "SDL3"
 extern fn SDL_GetHint: (name :str) :str lib "SDL3"
 
-pub fn init: (flags :i64) :bool { return SDL_Init(flags) }
+// ── Init flags ─────────────────────────────────────────────────────
+pub fn init_timer: () :i64 { return 0x00000001 }
+pub fn init_audio: () :i64 { return 0x00000010 }
+pub fn init_video: () :i64 { return 0x00000020 }
+pub fn init_joystick: () :i64 { return 0x00000200 }
+pub fn init_gamepad: () :i64 { return 0x00002000 }
+pub fn init_events: () :i64 { return 0x00004000 }
+pub fn init_sensor: () :i64 { return 0x00008000 }
+pub fn init_camera: () :i64 { return 0x00010000 }
+pub fn init_everything: () :i64 { return 0x0000003F }
 
-pub fn init_video: () :bool { return SDL_Init(0x00000020) }
+pub fn init: (flags :i64) :bool { return SDL_Init(flags) }
 
 pub fn quit: () { SDL_Quit() }
 

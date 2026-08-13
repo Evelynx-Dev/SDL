@@ -1,0 +1,67 @@
+module structs
+
+extern lib "SDL2"
+
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+
+extern fn rt_write_u32: (ptr :i64, val :i64) lib "c"
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
+extern fn rt_write_u8: (ptr :i64, val :i64) lib "c"
+extern fn rt_read_u8: (ptr :i64) :i64 lib "c"
+extern fn rt_write_f32: (ptr :i64, val :f64) lib "c"
+extern fn rt_read_f64: (ptr :i64) :f64 lib "c"
+
+pub fn rect_size: () :i64 { return 16 }
+pub fn point_size: () :i64 { return 8 }
+pub fn rect_invalid: () :i64 { return 0 }
+
+pub fn alloc: (size :i64) :i64 { return rt_alloc_raw(size) }
+pub fn destroy: (ptr :i64) {
+    if ptr != 0 { rt_free_raw(ptr) }
+}
+
+pub fn write_i32: (ptr :i64, offset :i64, val :i64) {
+    rt_write_u32(ptr + offset, val)
+}
+
+pub fn read_i32: (ptr :i64, offset :i64) :i64 {
+    return rt_read_u32(ptr + offset)
+}
+
+pub fn create_rect: (x :i64, y :i64, w :i64, h :i64) :i64 {
+    set ptr = alloc(rect_size())
+    if ptr == 0 { return 0 }
+    write_i32(ptr, 0, x)
+    write_i32(ptr, 4, y)
+    write_i32(ptr, 8, w)
+    write_i32(ptr, 12, h)
+    return ptr
+}
+
+pub fn create_point: (x :i64, y :i64) :i64 {
+    set ptr = alloc(point_size())
+    if ptr == 0 { return 0 }
+    write_i32(ptr, 0, x)
+    write_i32(ptr, 4, y)
+    return ptr
+}
+
+pub fn rect_get_x: (rect_ptr :i64) :i64 { return read_i32(rect_ptr, 0) }
+pub fn rect_get_y: (rect_ptr :i64) :i64 { return read_i32(rect_ptr, 4) }
+pub fn rect_get_w: (rect_ptr :i64) :i64 { return read_i32(rect_ptr, 8) }
+pub fn rect_get_h: (rect_ptr :i64) :i64 { return read_i32(rect_ptr, 12) }
+
+pub fn rect_set_x: (rect_ptr :i64, x :i64) { write_i32(rect_ptr, 0, x) }
+pub fn rect_set_y: (rect_ptr :i64, y :i64) { write_i32(rect_ptr, 4, y) }
+pub fn rect_set_w: (rect_ptr :i64, w :i64) { write_i32(rect_ptr, 8, w) }
+pub fn rect_set_h: (rect_ptr :i64, h :i64) { write_i32(rect_ptr, 12, h) }
+
+pub fn point_get_x: (ptr :i64) :i64 { return read_i32(ptr, 0) }
+pub fn point_get_y: (ptr :i64) :i64 { return read_i32(ptr, 4) }
+pub fn point_set_x: (ptr :i64, x :i64) { write_i32(ptr, 0, x) }
+pub fn point_set_y: (ptr :i64, y :i64) { write_i32(ptr, 4, y) }
+
+pub fn destroy_null: (ptr :i64) {
+    if ptr != 0 { rt_free_raw(ptr) }
+}

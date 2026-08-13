@@ -1,0 +1,9 @@
+module version
+
+extern lib "SDL2"
+
+extern fn SDL_GetRevision: () :str lib "SDL2"
+
+pub fn get_revision: () :str {
+    return SDL_GetRevision()
+}

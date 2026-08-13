@@ -9,11 +9,26 @@ extern fn SDL_PushEvent: (event_ptr :i64) :bool lib "SDL3"
 extern fn SDL_FlushEvent: (event_type :i64) lib "SDL3"
 extern fn SDL_FlushEvents: (min_type :i64, max_type :i64) lib "SDL3"
 
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+extern fn rt_read_u8: (ptr :i64) :i64 lib "c"
+extern fn rt_read_u16: (ptr :i64) :i64 lib "c"
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
+extern fn rt_read_i32: (ptr :i64) :i64 lib "c"
+extern fn rt_read_u64: (ptr :i64) :i64 lib "c"
+extern fn rt_read_ptr: (ptr :i64) :i64 lib "c"
+extern fn rt_read_f32: (ptr :i64) :f64 lib "c"
+extern fn rt_read_cstr: (ptr :i64) :str lib "c"
+extern fn rt_write_i32: (ptr :i64, val :i64) lib "c"
+
+// ── SDL3 event type constants (SDL_EventType enum) ──────────────────
 pub fn event_type_quit: () :i64 { return 0x100 }
 pub fn event_type_window_event: () :i64 { return 0x200 }
 pub fn event_type_key_down: () :i64 { return 0x300 }
 pub fn event_type_key_up: () :i64 { return 0x301 }
 pub fn event_type_text_input: () :i64 { return 0x303 }
+pub fn event_type_text_editing: () :i64 { return 0x304 }
+pub fn event_type_text_editing_candidates: () :i64 { return 0x305 }
 pub fn event_type_mouse_motion: () :i64 { return 0x400 }
 pub fn event_type_mouse_button_down: () :i64 { return 0x401 }
 pub fn event_type_mouse_button_up: () :i64 { return 0x402 }
@@ -30,29 +45,47 @@ pub fn event_type_display_event: () :i64 { return 0x900 }
 pub fn event_type_render_device_reset: () :i64 { return 0xA00 }
 pub fn event_type_user_event: () :i64 { return 0x8000 }
 
-pub fn window_event_shown: () :i64 { return 1 }
-pub fn window_event_hidden: () :i64 { return 2 }
-pub fn window_event_exposed: () :i64 { return 3 }
-pub fn window_event_moved: () :i64 { return 4 }
-pub fn window_event_resized: () :i64 { return 5 }
-pub fn window_event_minimized: () :i64 { return 6 }
-pub fn window_event_maximized: () :i64 { return 7 }
-pub fn window_event_restored: () :i64 { return 8 }
-pub fn window_event_mouse_enter: () :i64 { return 9 }
-pub fn window_event_mouse_leave: () :i64 { return 10 }
-pub fn window_event_focus_gained: () :i64 { return 11 }
-pub fn window_event_focus_lost: () :i64 { return 12 }
-pub fn window_event_close_requested: () :i64 { return 13 }
-pub fn window_event_hit_test: () :i64 { return 14 }
-pub fn window_event_iccp_changed: () :i64 { return 15 }
-pub fn window_event_display_changed: () :i64 { return 16 }
-pub fn window_event_display_scale_changed: () :i64 { return 17 }
-pub fn window_event_safe_area_changed: () :i64 { return 18 }
-pub fn window_event_occluded: () :i64 { return 19 }
-pub fn window_event_enter_fullscreen: () :i64 { return 20 }
-pub fn window_event_leave_fullscreen: () :i64 { return 21 }
-pub fn window_event_destroyed: () :i64 { return 22 }
+// ── Window event types (SDL3 SDL_EventType values) ────────────────
+// In SDL3 there is no window-event subtype: the event type itself is
+// SDL_EVENT_WINDOW_* = 0x200 + N, and data1/data2 carry the payload.
+pub fn window_event_shown: () :i64 { return 0x202 }
+pub fn window_event_hidden: () :i64 { return 0x203 }
+pub fn window_event_exposed: () :i64 { return 0x204 }
+pub fn window_event_moved: () :i64 { return 0x205 }
+pub fn window_event_resized: () :i64 { return 0x206 }
+pub fn window_event_pixel_size_changed: () :i64 { return 0x207 }
+pub fn window_event_minimized: () :i64 { return 0x209 }
+pub fn window_event_maximized: () :i64 { return 0x20A }
+pub fn window_event_restored: () :i64 { return 0x20B }
+pub fn window_event_mouse_enter: () :i64 { return 0x20C }
+pub fn window_event_mouse_leave: () :i64 { return 0x20D }
+pub fn window_event_focus_gained: () :i64 { return 0x20E }
+pub fn window_event_focus_lost: () :i64 { return 0x20F }
+pub fn window_event_close_requested: () :i64 { return 0x210 }
+pub fn window_event_hit_test: () :i64 { return 0x211 }
+pub fn window_event_iccp_changed: () :i64 { return 0x212 }
+pub fn window_event_display_changed: () :i64 { return 0x213 }
+pub fn window_event_display_scale_changed: () :i64 { return 0x214 }
+pub fn window_event_safe_area_changed: () :i64 { return 0x215 }
+pub fn window_event_occluded: () :i64 { return 0x216 }
+pub fn window_event_enter_fullscreen: () :i64 { return 0x217 }
+pub fn window_event_leave_fullscreen: () :i64 { return 0x218 }
+pub fn window_event_destroyed: () :i64 { return 0x219 }
 
+// ── SDL_Event allocation ───────────────────────────────────────────
+// SDL_Event is a 128-byte union on x86_64. Allocate once and reuse.
+pub fn event_size: () :i64 { return 128 }
+
+pub fn allocate_event: () :i64 {
+    set ptr = rt_alloc_raw(event_size())
+    return ptr
+}
+
+pub fn free_event: (ptr :i64) {
+    if ptr != 0 { rt_free_raw(ptr) }
+}
+
+// ── Event polling wrappers ─────────────────────────────────────────
 pub fn poll_event: (buf :i64) :bool { return SDL_PollEvent(buf) }
 
 pub fn wait_event: (buf :i64) :bool { return SDL_WaitEvent(buf) }
@@ -65,14 +98,171 @@ pub fn flush_event: (t :i64) { SDL_FlushEvent(t) }
 
 pub fn flush_events: (min :i64, max :i64) { SDL_FlushEvents(min, max) }
 
+// ── Generic event field reads ──────────────────────────────────────
+// Every SDL3 event struct starts with:
+//   offset  0: type (Uint32)
+//   offset  4: reserved (Uint32)
+//   offset  8: timestamp (Uint64)
+//   offset 16: windowID (Uint32)
+
 pub fn event_type: (buf :i64) :i64 {
     return rt_read_u32(buf)
 }
 
-extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
-
-pub fn window_event_type: (buf :i64) :i64 {
-    return rt_read_u8(buf + 8)
+pub fn event_window_id: (buf :i64) :i64 {
+    return rt_read_u32(buf + 16)
 }
 
-extern fn rt_read_u8: (ptr :i64) :i64 lib "c"
+// ── Window event fields ────────────────────────────────────────────
+// SDL_WindowEvent: data1 @ offset 20, data2 @ offset 24.
+// data1/data2 carry the event payload (e.g. new width/height on RESIZED).
+
+pub fn window_event_data1: (buf :i64) :i64 {
+    return rt_read_i32(buf + 20)
+}
+
+pub fn window_event_data2: (buf :i64) :i64 {
+    return rt_read_i32(buf + 24)
+}
+
+// ── Keyboard event fields ──────────────────────────────────────────
+// SDL_KeyboardEvent:
+//   offset 20: which (i32) — keyboard ID
+//   offset 24: scancode (i32) — SDL_Scancode
+//   offset 28: key (i32) — SDL_Keycode
+//   offset 32: mod (u16) — SDL_Keymod
+//   offset 36: down (u8) — bool
+//   offset 37: repeat (u8) — bool
+
+pub fn keyboard_scancode: (buf :i64) :i64 {
+    return rt_read_i32(buf + 24)
+}
+
+pub fn keyboard_keycode: (buf :i64) :i64 {
+    return rt_read_i32(buf + 28)
+}
+
+pub fn keyboard_mod: (buf :i64) :i64 {
+    return rt_read_u16(buf + 32)
+}
+
+pub fn keyboard_down: (buf :i64) :bool {
+    return rt_read_u8(buf + 36) != 0
+}
+
+pub fn keyboard_repeat: (buf :i64) :bool {
+    return rt_read_u8(buf + 37) != 0
+}
+
+// ── Text input event fields ────────────────────────────────────────
+// SDL_TextInputEvent:
+//   offset  0: type (Uint32)
+//   offset  4: reserved (Uint32)
+//   offset  8: timestamp (Uint64)
+//   offset 16: windowID (Uint32)
+//   offset 20: padding (4 bytes, align ptr to 8)
+//   offset 24: text (const char*) — pointer to UTF-8 string
+
+pub fn text_input_text: (buf :i64) :str {
+    set ptr = rt_read_ptr(buf + 24)
+    if ptr == 0 { return "" }
+    return rt_read_cstr(ptr)
+}
+
+// ── Mouse button event fields ──────────────────────────────────────
+// SDL_MouseButtonEvent:
+//   offset 24: button (u8) — button index
+//   offset 25: down (u8) — bool
+//   offset 26: clicks (u8)
+//   offset 28: x (f32)
+//   offset 32: y (f32)
+
+pub fn mouse_button: (buf :i64) :i64 {
+    return rt_read_u8(buf + 24)
+}
+
+pub fn mouse_down: (buf :i64) :bool {
+    return rt_read_u8(buf + 25) != 0
+}
+
+pub fn mouse_clicks: (buf :i64) :i64 {
+    return rt_read_u8(buf + 26)
+}
+
+pub fn mouse_x: (buf :i64) :f64 {
+    return rt_read_f32(buf + 28)
+}
+
+pub fn mouse_y: (buf :i64) :f64 {
+    return rt_read_f32(buf + 32)
+}
+
+// ── Mouse motion event fields ──────────────────────────────────────
+// SDL_MouseMotionEvent:
+//   offset 24: state (u32) — button state mask
+//   offset 28: x (f32)
+//   offset 32: y (f32)
+//   offset 36: xrel (f32)
+//   offset 40: yrel (f32)
+
+pub fn mouse_motion_state: (buf :i64) :i64 {
+    return rt_read_u32(buf + 24)
+}
+
+pub fn mouse_motion_x: (buf :i64) :f64 {
+    return rt_read_f32(buf + 28)
+}
+
+pub fn mouse_motion_y: (buf :i64) :f64 {
+    return rt_read_f32(buf + 32)
+}
+
+pub fn mouse_motion_xrel: (buf :i64) :f64 {
+    return rt_read_f32(buf + 36)
+}
+
+pub fn mouse_motion_yrel: (buf :i64) :f64 {
+    return rt_read_f32(buf + 40)
+}
+
+// ── Mouse wheel event fields ────────────────────────────────────────
+// SDL_MouseWheelEvent:
+//   offset 20: which (u32) — mouse instance id
+//   offset 24: x (f32) — horizontal scroll amount
+//   offset 28: y (f32) — vertical scroll amount
+//   offset 32: direction (u32)
+//   offset 36: mouse_x (f32) — cursor position
+//   offset 40: mouse_y (f32)
+//   offset 44: integer_x (i32) — whole scroll ticks
+//   offset 48: integer_y (i32)
+
+pub fn mouse_wheel_x: (buf :i64) :f64 {
+    return rt_read_f32(buf + 24)
+}
+
+pub fn mouse_wheel_y: (buf :i64) :f64 {
+    return rt_read_f32(buf + 28)
+}
+
+pub fn mouse_wheel_mouse_x: (buf :i64) :f64 {
+    return rt_read_f32(buf + 36)
+}
+
+pub fn mouse_wheel_mouse_y: (buf :i64) :f64 {
+    return rt_read_f32(buf + 40)
+}
+
+pub fn mouse_wheel_integer_x: (buf :i64) :i64 {
+    return rt_read_i32(buf + 44)
+}
+
+pub fn mouse_wheel_integer_y: (buf :i64) :i64 {
+    return rt_read_i32(buf + 48)
+}
+
+// ── Mouse button constants ─────────────────────────────────────────
+pub fn mouse_left: () :i64 { return 1 }
+pub fn mouse_middle: () :i64 { return 2 }
+pub fn mouse_right: () :i64 { return 3 }
+pub fn mouse_x1: () :i64 { return 4 }
+pub fn mouse_x2: () :i64 { return 5 }

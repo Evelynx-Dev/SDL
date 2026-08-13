@@ -1,0 +1,124 @@
+load kioto
+load sdl::sdl3
+
+@[test]
+pub fn test_structs_create_rect: () :bool {
+    set rect = render::create_rect(10 20 100 200)
+    if rect == 0 { return false }
+    if render::rect_get_x(rect) != 10 {
+        render::destroy_rect(rect)
+        return false
+    }
+    if render::rect_get_y(rect) != 20 {
+        render::destroy_rect(rect)
+        return false
+    }
+    if render::rect_get_w(rect) != 100 {
+        render::destroy_rect(rect)
+        return false
+    }
+    if render::rect_get_h(rect) != 200 {
+        render::destroy_rect(rect)
+        return false
+    }
+    render::destroy_rect(rect)
+    return true
+}
+
+@[test]
+pub fn test_structs_modify_rect: () :bool {
+    set rect = render::create_rect(0 0 10 20)
+    if rect == 0 { return false }
+    render::rect_set_x(rect 30)
+    render::rect_set_y(rect 40)
+    render::rect_set_w(rect 100)
+    render::rect_set_h(rect 200)
+    if render::rect_get_x(rect) != 30 {
+        render::destroy_rect(rect)
+        return false
+    }
+    if render::rect_get_y(rect) != 40 {
+        render::destroy_rect(rect)
+        return false
+    }
+    if render::rect_get_w(rect) != 100 {
+        render::destroy_rect(rect)
+        return false
+    }
+    if render::rect_get_h(rect) != 200 {
+        render::destroy_rect(rect)
+        return false
+    }
+    render::destroy_rect(rect)
+    return true
+}
+
+@[test]
+pub fn test_structs_color_constants: () :bool {
+    set w = render::color_white()
+    if w == 0 { return false }
+    if render::color_get_r(w) != 255 {
+        render::color_destroy(w)
+        return false
+    }
+    if render::color_get_g(w) != 255 {
+        render::color_destroy(w)
+        return false
+    }
+    if render::color_get_b(w) != 255 {
+        render::color_destroy(w)
+        return false
+    }
+    if render::color_get_a(w) != 255 {
+        render::color_destroy(w)
+        return false
+    }
+    render::color_destroy(w)
+    
+    set b = render::color_black()
+    if b == 0 { return false }
+    if render::color_get_r(b) != 0 {
+        render::color_destroy(b)
+        return false
+    }
+    if render::color_get_a(b) != 255 {
+        render::color_destroy(b)
+        return false
+    }
+    render::color_destroy(b)
+    return true
+}
+
+@[test]
+pub fn test_structs_destroy_null: () :bool {
+    render::destroy_rect(0)
+    return true
+}
+
+@[test]
+pub fn test_structs_color_setters: () :bool {
+    set c = render::color_black()
+    if c == 0 { return false }
+    render::color_set_r(c, 100)
+    render::color_set_g(c, 150)
+    render::color_set_b(c, 200)
+    render::color_set_a(c, 255)
+    if render::color_get_r(c) != 100 {
+        render::color_destroy(c)
+        return false
+    }
+    if render::color_get_g(c) != 150 {
+        render::color_destroy(c)
+        return false
+    }
+    if render::color_get_b(c) != 200 {
+        render::color_destroy(c)
+        return false
+    }
+    if render::color_get_a(c) != 255 {
+        render::color_destroy(c)
+        return false
+    }
+    render::color_destroy(c)
+    return true
+}

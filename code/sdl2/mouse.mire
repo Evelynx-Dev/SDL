@@ -1,0 +1,45 @@
+module mouse
+
+extern lib "SDL2"
+
+extern fn SDL_GetMouseState: (x :i64, y :i64) :i64 lib "SDL2"
+extern fn SDL_GetGlobalMouseState: (x :i64, y :i64) :i64 lib "SDL2"
+extern fn SDL_WarpMouseInWindow: (window :i64, x :i64, y :i64) lib "SDL2"
+extern fn SDL_WarpMouseGlobal: (x :i64, y :i64) :i64 lib "SDL2"
+extern fn SDL_SetRelativeMouseMode: (enabled :i64) :i64 lib "SDL2"
+extern fn SDL_GetRelativeMouseMode: () :i64 lib "SDL2"
+extern fn SDL_CaptureMouse: (enabled :i64) :i64 lib "SDL2"
+
+pub fn get_mouse_state: (x :i64, y :i64) :i64 {
+    return SDL_GetMouseState(x, y)
+}
+
+pub fn get_global_mouse_state: (x :i64, y :i64) :i64 {
+    return SDL_GetGlobalMouseState(x, y)
+}
+
+pub fn warp_mouse_in_window: (win :i64, x :i64, y :i64) {
+    SDL_WarpMouseInWindow(win, x, y)
+}
+
+pub fn warp_mouse_global: (x :i64, y :i64) :i64 {
+    return SDL_WarpMouseGlobal(x, y)
+}
+
+pub fn set_relative_mouse_mode: (enabled :i64) :i64 {
+    return SDL_SetRelativeMouseMode(enabled)
+}
+
+pub fn get_relative_mouse_mode: () :i64 {
+    return SDL_GetRelativeMouseMode()
+}
+
+pub fn capture_mouse: (enabled :i64) :i64 {
+    return SDL_CaptureMouse(enabled)
+}
+
+pub fn button_left: () :i64 { return 1 }
+pub fn button_middle: () :i64 { return 2 }
+pub fn button_right: () :i64 { return 4 }
+pub fn button_x1: () :i64 { return 8 }
+pub fn button_x2: () :i64 { return 16 }

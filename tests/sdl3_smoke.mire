@@ -1,0 +1,35 @@
+load kioto
+load sdl::sdl3
+
+@[test]
+pub fn test_sdl3_init_timer: () :bool {
+    // SDL_INIT_TIMER = 0x00000001, no display needed
+    if !sdl3::init(0x00000001) {
+        dasu(sdl3::get_error())
+        return false
+    }
+    set start = sdl3::get_ticks()
+    sdl3::delay(10)
+    set elapsed = sdl3::get_ticks() - start
+    sdl3::quit()
+    return elapsed >= 0
+}
+
+@[test]
+pub fn test_sdl3_hints: () :bool {
+    if !sdl3::init(0x00000001) { return false }
+    set ok = sdl3::set_hint("SDL_HINT_TEST" "hello")
+    set val = sdl3::get_hint("SDL_HINT_TEST")
+    sdl3::quit()
+    return ok && val == "hello"
+}
+
+@[test]
+pub fn test_sdl3_timer_ns: () :bool {
+    if !sdl3::init(0x00000001) { return false }
+    set start = sdl3::get_ticks_ns()
+    timer::delay_precise(1000000)
+    set end = sdl3::get_ticks_ns()
+    sdl3::quit()
+    return end >= start
+}

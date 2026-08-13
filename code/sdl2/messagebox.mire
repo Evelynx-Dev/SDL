@@ -1,0 +1,13 @@
+module messagebox
+
+extern lib "SDL2"
+
+extern fn SDL_ShowSimpleMessageBox: (flags :i64, title :str, message :str, window :i64) :i64 lib "SDL2"
+
+pub fn flag_error: () :i64 { return 0x00000010 }
+pub fn flag_warning: () :i64 { return 0x00000020 }
+pub fn flag_information: () :i64 { return 0x00000040 }
+
+pub fn show_simple_message_box: (flags :i64, title :str, message :str) :i64 {
+    return SDL_ShowSimpleMessageBox(flags, title, message, 0)
+}

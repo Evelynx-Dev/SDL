@@ -31,6 +31,8 @@ extern fn SDL_GetDisplayUsableBounds: (display_id :i64, rect_ptr :i64) :bool lib
 extern fn SDL_GetDesktopDisplayMode: (display_id :i64) :i64 lib "SDL3"
 extern fn SDL_GetCurrentDisplayMode: (display_id :i64) :i64 lib "SDL3"
 extern fn SDL_GetDisplayForWindow: (window :i64) :i64 lib "SDL3"
+extern fn SDL_SetWindowResizable: (window :i64, resizable :bool) lib "SDL3"
+extern fn SDL_SetWindowBordered: (window :i64, bordered :bool) lib "SDL3"
 
 pub fn window_flag_fullscreen: () :i64 { return 0x0000000000000001 }
 pub fn window_flag_opengl: () :i64 { return 0x0000000000000002 }
@@ -107,3 +109,11 @@ pub fn get_display_bounds: (id :i64, rect_ptr :i64) :bool { return SDL_GetDispla
 pub fn get_display_usable_bounds: (id :i64, rect_ptr :i64) :bool { return SDL_GetDisplayUsableBounds(id rect_ptr) }
 
 pub fn get_display_for_window: (win :i64) :i64 { return SDL_GetDisplayForWindow(win) }
+
+pub fn set_window_resizable: (win :i64, resizable :bool) :bool {
+    return SDL_SetWindowResizable(win, resizable)
+}
+
+pub fn set_window_bordered: (win :i64, bordered :bool) :bool {
+    return SDL_SetWindowBordered(win, bordered)
+}

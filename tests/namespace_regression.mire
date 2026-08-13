@@ -1,0 +1,30 @@
+load kioto
+load sdl::sdl3
+
+@[test]
+pub fn test_full_load_exposes_sub_namespaces: () :bool {
+    set a = video::create_window("t" 8 8)
+    set c = events::event_type_quit()
+    set d = timer::get_ticks()
+    set e = clipboard::has_clipboard_text()
+    set f = audio::get_playback_devices(0)
+    set g = sdl3::get_ticks()
+    return a >= -1 && c == 256 && d >= 0 && g >= 0
+}
+
+@[test]
+pub fn test_direct_submodule_loads_expose_namespaces: () :bool {
+    set a = render::create_renderer(0)
+    set b = video::create_window("t" 8 8)
+    set c = events::event_type_quit()
+    set d = timer::get_ticks_ns()
+    return a >= -1 && b >= -1 && c == 256 && d >= 0
+}
+
+@[test]
+pub fn test_new_headless_modules_exposed_via_full_load: () :bool {
+    set v = version::get_version()
+    set m = version::major(v)
+    set cores = cpuinfo::get_num_logical_cpu_cores()
+    return m == 3 && cores > 0
+}

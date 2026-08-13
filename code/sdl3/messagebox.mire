@@ -1,0 +1,17 @@
+module messagebox
+
+extern lib "SDL3"
+
+extern fn SDL_ShowSimpleMessageBox: (flags :i64, title :str, message :str, window :i64) :bool lib "SDL3"
+
+pub fn flag_error: () :i64 { return 0x00000010 }
+pub fn flag_warning: () :i64 { return 0x00000020 }
+pub fn flag_information: () :i64 { return 0x00000040 }
+pub fn flag_buttons_left_to_right: () :i64 { return 0x00000080 }
+pub fn flag_buttons_right_to_left: () :i64 { return 0x00000100 }
+pub fn flag_button_returnkey_default: () :i64 { return 0x00000200 }
+pub fn flag_button_escapekey_default: () :i64 { return 0x00000400 }
+
+pub fn show_simple_message_box: (flags :i64, title :str, message :str) :bool {
+    return SDL_ShowSimpleMessageBox(flags, title, message, 0)
+}

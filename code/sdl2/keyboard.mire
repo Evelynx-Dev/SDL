@@ -1,0 +1,55 @@
+module keyboard
+
+extern lib "SDL2"
+
+extern fn SDL_GetModState: () :i64 lib "SDL2"
+extern fn SDL_SetModState: (modstate :i64) lib "SDL2"
+extern fn SDL_GetKeyFromScancode: (scancode :i64) :i64 lib "SDL2"
+extern fn SDL_GetScancodeFromKey: (key :i64) :i64 lib "SDL2"
+extern fn SDL_GetScancodeName: (scancode :i64) :str lib "SDL2"
+extern fn SDL_GetScancodeFromName: (name :str) :i64 lib "SDL2"
+extern fn SDL_GetKeyName: (key :i64) :str lib "SDL2"
+extern fn SDL_GetKeyFromName: (name :str) :i64 lib "SDL2"
+
+pub fn get_mod_state: () :i64 {
+    return SDL_GetModState()
+}
+
+pub fn set_mod_state: (state :i64) {
+    SDL_SetModState(state)
+}
+
+pub fn key_from_scancode: (scancode :i64) :i64 {
+    return SDL_GetKeyFromScancode(scancode)
+}
+
+pub fn scancode_from_key: (key :i64) :i64 {
+    return SDL_GetScancodeFromKey(key)
+}
+
+pub fn get_scancode_name: (scancode :i64) :str {
+    return SDL_GetScancodeName(scancode)
+}
+
+pub fn get_scancode_from_name: (name :str) :i64 {
+    return SDL_GetScancodeFromName(name)
+}
+
+pub fn get_key_name: (key :i64) :str {
+    return SDL_GetKeyName(key)
+}
+
+pub fn get_key_from_name: (name :str) :i64 {
+    return SDL_GetKeyFromName(name)
+}
+
+pub fn mod_none: () :i64 { return 0x0000 }
+pub fn mod_left_shift: () :i64 { return 0x0001 }
+pub fn mod_right_shift: () :i64 { return 0x0002 }
+pub fn mod_left_ctrl: () :i64 { return 0x0040 }
+pub fn mod_right_ctrl: () :i64 { return 0x0080 }
+pub fn mod_left_alt: () :i64 { return 0x0100 }
+pub fn mod_right_alt: () :i64 { return 0x0200 }
+pub fn mod_shift: () :i64 { return 0x0003 }
+pub fn mod_ctrl: () :i64 { return 0x00C0 }
+pub fn mod_alt: () :i64 { return 0x0300 }
