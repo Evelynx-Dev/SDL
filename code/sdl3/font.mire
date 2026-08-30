@@ -162,7 +162,7 @@ pub fn draw_text_to_buffer: (buf :i64, buf_w :i64, x :i64, y :i64, text :&str, s
     while i < rt_strings_len(text) {
         set ch = rt_font_char_at(text, i)
         if ch != 0 {
-            draw_char_to_buffer(buf, buf_w, cx, y, ch, color, scale, clip_x, clip_y, clip_w, clip_h)
+            use! font::draw_char_to_buffer(buf, buf_w, cx, y, ch, color, scale, clip_x, clip_y, clip_w, clip_h)
         }
         set cx = cx + (5 + spacing) * scale
         set i = i + rt_font_char_len(text, i)
@@ -179,17 +179,17 @@ pub fn draw_text_with_cursor: (buf :i64, buf_w :i64, x :i64, y :i64, text :&str,
     set chh = 7 * scale :i64 mut
     while i < n {
         if ci == col_idx {
-            fill_rect(buf, buf_w, cx, y, cw, chh, cursor_color, clip_x, clip_y, clip_w, clip_h)
+            use! font::fill_rect(buf, buf_w, cx, y, cw, chh, cursor_color, clip_x, clip_y, clip_w, clip_h)
         }
         set ch = rt_font_char_at(text, i)
         if ch != 0 {
-            draw_char_to_buffer(buf, buf_w, cx, y, ch, color, scale, clip_x, clip_y, clip_w, clip_h)
+            use! font::draw_char_to_buffer(buf, buf_w, cx, y, ch, color, scale, clip_x, clip_y, clip_w, clip_h)
         }
         set cx = cx + cw
         set i = i + rt_font_char_len(text, i)
         set ci = ci + 1
     }
     if col_idx >= ci {
-        fill_rect(buf, buf_w, cx, y, cw, chh, cursor_color, clip_x, clip_y, clip_w, clip_h)
+        use! font::fill_rect(buf, buf_w, cx, y, cw, chh, cursor_color, clip_x, clip_y, clip_w, clip_h)
     }
 }

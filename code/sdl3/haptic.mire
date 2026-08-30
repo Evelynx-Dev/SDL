@@ -1,0 +1,89 @@
+module haptic
+
+extern lib "SDL3"
+
+extern fn SDL_GetHaptics: (count_ptr :i64) :i64 lib "SDL3"
+extern fn SDL_GetHapticNameForID: (instance_id :i64) :str lib "SDL3"
+extern fn SDL_OpenHaptic: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetHapticFromID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetHapticID: (haptic :i64) :i64 lib "SDL3"
+extern fn SDL_GetHapticName: (haptic :i64) :str lib "SDL3"
+extern fn SDL_CloseHaptic: (haptic :i64) lib "SDL3"
+extern fn SDL_GetMaxHapticEffects: (haptic :i64) :i64 lib "SDL3"
+extern fn SDL_GetMaxHapticEffectsPlaying: (haptic :i64) :i64 lib "SDL3"
+extern fn SDL_GetHapticFeatures: (haptic :i64) :i64 lib "SDL3"
+extern fn SDL_GetNumHapticAxes: (haptic :i64) :i64 lib "SDL3"
+extern fn SDL_HapticRumbleSupported: (haptic :i64) :bool lib "SDL3"
+extern fn SDL_InitHapticRumble: (haptic :i64) :bool lib "SDL3"
+extern fn SDL_PlayHapticRumble: (haptic :i64, strength :f64, length :i64) :bool lib "SDL3"
+extern fn SDL_StopHapticRumble: (haptic :i64) :bool lib "SDL3"
+extern fn SDL_IsMouseHaptic: () :bool lib "SDL3"
+extern fn SDL_OpenHapticFromMouse: () :i64 lib "SDL3"
+extern fn SDL_IsJoystickHaptic: (joystick :i64) :bool lib "SDL3"
+extern fn SDL_OpenHapticFromJoystick: (joystick :i64) :i64 lib "SDL3"
+extern fn SDL_PauseHaptic: (haptic :i64) :bool lib "SDL3"
+extern fn SDL_ResumeHaptic: (haptic :i64) :bool lib "SDL3"
+extern fn SDL_StopHapticEffects: (haptic :i64) :bool lib "SDL3"
+extern fn SDL_SetHapticGain: (haptic :i64, gain :i64) :bool lib "SDL3"
+extern fn SDL_SetHapticAutocenter: (haptic :i64, autocenter :i64) :bool lib "SDL3"
+
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
+
+pub fn get_count: () :i64 {
+    set count_ptr = rt_alloc_raw(4)
+    if count_ptr == 0 { return 0 }
+    SDL_GetHaptics(count_ptr)
+    set count = rt_read_u32(count_ptr)
+    rt_free_raw(count_ptr)
+    return count
+}
+
+pub fn get_name_for_id: (instance_id :i64) :str { return SDL_GetHapticNameForID(instance_id) }
+pub fn open: (instance_id :i64) :i64 { return SDL_OpenHaptic(instance_id) }
+pub fn get_from_id: (instance_id :i64) :i64 { return SDL_GetHapticFromID(instance_id) }
+pub fn get_id: (haptic :i64) :i64 { return SDL_GetHapticID(haptic) }
+pub fn get_name: (haptic :i64) :str { return SDL_GetHapticName(haptic) }
+pub fn close: (haptic :i64) { SDL_CloseHaptic(haptic) }
+
+pub fn get_max_effects: (haptic :i64) :i64 { return SDL_GetMaxHapticEffects(haptic) }
+pub fn get_max_effects_playing: (haptic :i64) :i64 { return SDL_GetMaxHapticEffectsPlaying(haptic) }
+pub fn get_features: (haptic :i64) :i64 { return SDL_GetHapticFeatures(haptic) }
+pub fn get_num_axes: (haptic :i64) :i64 { return SDL_GetNumHapticAxes(haptic) }
+
+pub fn rumble_supported: (haptic :i64) :bool { return SDL_HapticRumbleSupported(haptic) }
+pub fn init_rumble: (haptic :i64) :bool { return SDL_InitHapticRumble(haptic) }
+pub fn play_rumble: (haptic :i64, strength :f64, length_ms :i64) :bool { return SDL_PlayHapticRumble(haptic strength length_ms) }
+pub fn stop_rumble: (haptic :i64) :bool { return SDL_StopHapticRumble(haptic) }
+
+pub fn is_mouse_haptic: () :bool { return SDL_IsMouseHaptic() }
+pub fn open_from_mouse: () :i64 { return SDL_OpenHapticFromMouse() }
+pub fn is_joystick_haptic: (joystick :i64) :bool { return SDL_IsJoystickHaptic(joystick) }
+pub fn open_from_joystick: (joystick :i64) :i64 { return SDL_OpenHapticFromJoystick(joystick) }
+
+pub fn pause: (haptic :i64) :bool { return SDL_PauseHaptic(haptic) }
+pub fn resume: (haptic :i64) :bool { return SDL_ResumeHaptic(haptic) }
+pub fn stop_effects: (haptic :i64) :bool { return SDL_StopHapticEffects(haptic) }
+pub fn set_gain: (haptic :i64, gain :i64) :bool { return SDL_SetHapticGain(haptic gain) }
+pub fn set_autocenter: (haptic :i64, autocenter :i64) :bool { return SDL_SetHapticAutocenter(haptic autocenter) }
+
+// ── Haptic feature flags ────────────────────────────────────────────
+pub fn feature_constant: () :i64 { return 0x00000001 }
+pub fn feature_sine: () :i64 { return 0x00000002 }
+pub fn feature_square: () :i64 { return 0x00000004 }
+pub fn feature_triangle: () :i64 { return 0x00000008 }
+pub fn feature_sawtooth_up: () :i64 { return 0x00000010 }
+pub fn feature_sawtooth_down: () :i64 { return 0x00000020 }
+pub fn feature_ramp: () :i64 { return 0x00000040 }
+pub fn feature_spring: () :i64 { return 0x00000080 }
+pub fn feature_damper: () :i64 { return 0x00000100 }
+pub fn feature_inertia: () :i64 { return 0x00000200 }
+pub fn feature_friction: () :i64 { return 0x00000400 }
+pub fn feature_leftrumble: () :i64 { return 0x00001000 }
+pub fn feature_rightrumble: () :i64 { return 0x00002000 }
+pub fn feature_cheap_amplitude: () :i64 { return 0x00004000 }
+pub fn feature_autocenter: () :i64 { return 0x00008000 }
+pub fn feature_gain: () :i64 { return 0x00010000 }
+pub fn feature_pause: () :i64 { return 0x00020000 }
+pub fn feature_axis_relative: () :i64 { return 0x00040000 }

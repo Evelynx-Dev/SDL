@@ -10,7 +10,7 @@ extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
 extern fn rt_write_u64: (ptr :i64, val :i64) lib "c"
 extern fn rt_read_u64: (ptr :i64) :i64 lib "c"
 extern fn rt_write_f32: (ptr :i64, val :f64) lib "c"
-extern fn rt_read_f64: (ptr :i64) :f64 lib "c"
+extern fn rt_read_f32: (ptr :i64) :f64 lib "c"
 
 pub fn rect_size: () :i64 { return 16 }
 pub fn frect_size: () :i64 { return 16 }
@@ -37,47 +37,47 @@ pub fn write_f32: (ptr :i64, offset :i64, val :f64) {
 }
 
 pub fn read_f32: (ptr :i64, offset :i64) :f64 {
-    return rt_read_f64(ptr + offset)
+    return rt_read_f32(ptr + offset)
 }
 
 pub fn create_rect: (x :i64, y :i64, w :i64, h :i64) :i64 {
-    set ptr = alloc(rect_size())
+    set ptr = use! structs::alloc(use! structs::rect_size())
     if ptr == 0 { return 0 }
-    write_i32(ptr, 0, x)
-    write_i32(ptr, 4, y)
-    write_i32(ptr, 8, w)
-    write_i32(ptr, 12, h)
+    use! structs::write_i32(ptr, 0, x)
+    use! structs::write_i32(ptr, 4, y)
+    use! structs::write_i32(ptr, 8, w)
+    use! structs::write_i32(ptr, 12, h)
     return ptr
 }
 
 pub fn create_frect: (x :f64, y :f64, w :f64, h :f64) :i64 {
-    set ptr = alloc(frect_size())
+    set ptr = use! structs::alloc(use! structs::frect_size())
     if ptr == 0 { return 0 }
-    write_f32(ptr, 0, x)
-    write_f32(ptr, 4, y)
-    write_f32(ptr, 8, w)
-    write_f32(ptr, 12, h)
+    use! structs::write_f32(ptr, 0, x)
+    use! structs::write_f32(ptr, 4, y)
+    use! structs::write_f32(ptr, 8, w)
+    use! structs::write_f32(ptr, 12, h)
     return ptr
 }
 
 pub fn create_point: (x :i64, y :i64) :i64 {
-    set ptr = alloc(point_size())
+    set ptr = use! structs::alloc(use! structs::point_size())
     if ptr == 0 { return 0 }
-    write_i32(ptr, 0, x)
-    write_i32(ptr, 4, y)
+    use! structs::write_i32(ptr, 0, x)
+    use! structs::write_i32(ptr, 4, y)
     return ptr
 }
 
 pub fn create_fpoint: (x :f64, y :f64) :i64 {
-    set ptr = alloc(fpoint_size())
+    set ptr = use! structs::alloc(use! structs::fpoint_size())
     if ptr == 0 { return 0 }
-    write_f32(ptr, 0, x)
-    write_f32(ptr, 4, y)
+    use! structs::write_f32(ptr, 0, x)
+    use! structs::write_f32(ptr, 4, y)
     return ptr
 }
 
 pub fn create_color: (r :i64, g :i64, b :i64, a :i64) :i64 {
-    set ptr = alloc(color_size())
+    set ptr = use! structs::alloc(use! structs::color_size())
     if ptr == 0 { return 0 }
     rt_write_u8(ptr, r)
     rt_write_u8(ptr + 1, g)
@@ -86,35 +86,35 @@ pub fn create_color: (r :i64, g :i64, b :i64, a :i64) :i64 {
     return ptr
 }
 
-pub fn rect_get_x: (rect_ptr :i64) :i64 { return read_i32(rect_ptr, 0) }
-pub fn rect_get_y: (rect_ptr :i64) :i64 { return read_i32(rect_ptr, 4) }
-pub fn rect_get_w: (rect_ptr :i64) :i64 { return read_i32(rect_ptr, 8) }
-pub fn rect_get_h: (rect_ptr :i64) :i64 { return read_i32(rect_ptr, 12) }
+pub fn rect_get_x: (rect_ptr :i64) :i64 { return use! structs::read_i32(rect_ptr, 0) }
+pub fn rect_get_y: (rect_ptr :i64) :i64 { return use! structs::read_i32(rect_ptr, 4) }
+pub fn rect_get_w: (rect_ptr :i64) :i64 { return use! structs::read_i32(rect_ptr, 8) }
+pub fn rect_get_h: (rect_ptr :i64) :i64 { return use! structs::read_i32(rect_ptr, 12) }
 
-pub fn rect_set_x: (rect_ptr :i64, x :i64) { write_i32(rect_ptr, 0, x) }
-pub fn rect_set_y: (rect_ptr :i64, y :i64) { write_i32(rect_ptr, 4, y) }
-pub fn rect_set_w: (rect_ptr :i64, w :i64) { write_i32(rect_ptr, 8, w) }
-pub fn rect_set_h: (rect_ptr :i64, h :i64) { write_i32(rect_ptr, 12, h) }
+pub fn rect_set_x: (rect_ptr :i64, x :i64) { use! structs::write_i32(rect_ptr, 0, x) }
+pub fn rect_set_y: (rect_ptr :i64, y :i64) { use! structs::write_i32(rect_ptr, 4, y) }
+pub fn rect_set_w: (rect_ptr :i64, w :i64) { use! structs::write_i32(rect_ptr, 8, w) }
+pub fn rect_set_h: (rect_ptr :i64, h :i64) { use! structs::write_i32(rect_ptr, 12, h) }
 
-pub fn frect_get_x: (rect_ptr :i64) :f64 { return read_f32(rect_ptr, 0) }
-pub fn frect_get_y: (rect_ptr :i64) :f64 { return read_f32(rect_ptr, 4) }
-pub fn frect_get_w: (rect_ptr :i64) :f64 { return read_f32(rect_ptr, 8) }
-pub fn frect_get_h: (rect_ptr :i64) :f64 { return read_f32(rect_ptr, 12) }
+pub fn frect_get_x: (rect_ptr :i64) :f64 { return use! structs::read_f32(rect_ptr, 0) }
+pub fn frect_get_y: (rect_ptr :i64) :f64 { return use! structs::read_f32(rect_ptr, 4) }
+pub fn frect_get_w: (rect_ptr :i64) :f64 { return use! structs::read_f32(rect_ptr, 8) }
+pub fn frect_get_h: (rect_ptr :i64) :f64 { return use! structs::read_f32(rect_ptr, 12) }
 
-pub fn frect_set_x: (rect_ptr :i64, x :f64) { write_f32(rect_ptr, 0, x) }
-pub fn frect_set_y: (rect_ptr :i64, y :f64) { write_f32(rect_ptr, 4, y) }
-pub fn frect_set_w: (rect_ptr :i64, w :f64) { write_f32(rect_ptr, 8, w) }
-pub fn frect_set_h: (rect_ptr :i64, h :f64) { write_f32(rect_ptr, 12, h) }
+pub fn frect_set_x: (rect_ptr :i64, x :f64) { use! structs::write_f32(rect_ptr, 0, x) }
+pub fn frect_set_y: (rect_ptr :i64, y :f64) { use! structs::write_f32(rect_ptr, 4, y) }
+pub fn frect_set_w: (rect_ptr :i64, w :f64) { use! structs::write_f32(rect_ptr, 8, w) }
+pub fn frect_set_h: (rect_ptr :i64, h :f64) { use! structs::write_f32(rect_ptr, 12, h) }
 
-pub fn point_get_x: (ptr :i64) :i64 { return read_i32(ptr, 0) }
-pub fn point_get_y: (ptr :i64) :i64 { return read_i32(ptr, 4) }
-pub fn point_set_x: (ptr :i64, x :i64) { write_i32(ptr, 0, x) }
-pub fn point_set_y: (ptr :i64, y :i64) { write_i32(ptr, 4, y) }
+pub fn point_get_x: (ptr :i64) :i64 { return use! structs::read_i32(ptr, 0) }
+pub fn point_get_y: (ptr :i64) :i64 { return use! structs::read_i32(ptr, 4) }
+pub fn point_set_x: (ptr :i64, x :i64) { use! structs::write_i32(ptr, 0, x) }
+pub fn point_set_y: (ptr :i64, y :i64) { use! structs::write_i32(ptr, 4, y) }
 
-pub fn fpoint_get_x: (ptr :i64) :f64 { return read_f32(ptr, 0) }
-pub fn fpoint_get_y: (ptr :i64) :f64 { return read_f32(ptr, 4) }
-pub fn fpoint_set_x: (ptr :i64, x :f64) { write_f32(ptr, 0, x) }
-pub fn fpoint_set_y: (ptr :i64, y :f64) { write_f32(ptr, 4, y) }
+pub fn fpoint_get_x: (ptr :i64) :f64 { return use! structs::read_f32(ptr, 0) }
+pub fn fpoint_get_y: (ptr :i64) :f64 { return use! structs::read_f32(ptr, 4) }
+pub fn fpoint_set_x: (ptr :i64, x :f64) { use! structs::write_f32(ptr, 0, x) }
+pub fn fpoint_set_y: (ptr :i64, y :f64) { use! structs::write_f32(ptr, 4, y) }
 
 pub fn color_get_r: (ptr :i64) :i64 { return rt_read_u8(ptr) }
 pub fn color_get_g: (ptr :i64) :i64 { return rt_read_u8(ptr + 1) }

@@ -61,6 +61,8 @@ extern fn rt_free_raw: (ptr :i64) lib "c"
 extern fn rt_write_u32: (ptr :i64, val :i64) lib "c"
 extern fn rt_write_u8: (ptr :i64, val :i64) lib "c"
 extern fn rt_read_u8: (ptr :i64) :i64 lib "c"
+extern fn rt_write_f32: (ptr :i64, val :f64) lib "c"
+extern fn rt_read_ptr: (ptr :i64) :i64 lib "c"
 
 pub fn texture_access_static: () :i64 { return 0 }
 pub fn texture_access_streaming: () :i64 { return 1 }
@@ -203,10 +205,10 @@ pub fn fill_rect: (rend :i64, rect_ptr :i64) :bool {
 }
 
 pub fn fill_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :bool {
-    set rect = create_rect(x y w h)
+    set rect = use! render::create_rect(x y w h)
     if rect == 0 { return false }
     set ok = SDL_RenderFillRect(rend rect)
-    destroy_rect(rect)
+    use! render::destroy_rect(rect)
     return ok
 }
 
@@ -215,10 +217,10 @@ pub fn draw_rect: (rend :i64, rect_ptr :i64) :bool {
 }
 
 pub fn draw_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :bool {
-    set rect = create_rect(x y w h)
+    set rect = use! render::create_rect(x y w h)
     if rect == 0 { return false }
     set ok = SDL_RenderRect(rend rect)
-    destroy_rect(rect)
+    use! render::destroy_rect(rect)
     return ok
 }
 
@@ -235,10 +237,10 @@ pub fn set_viewport: (rend :i64, rect_ptr :i64) :bool {
 }
 
 pub fn set_viewport_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :bool {
-    set rect = create_rect(x y w h)
+    set rect = use! render::create_rect(x y w h)
     if rect == 0 { return false }
     set ok = SDL_SetRenderViewport(rend rect)
-    destroy_rect(rect)
+    use! render::destroy_rect(rect)
     return ok
 }
 
@@ -255,10 +257,10 @@ pub fn set_clip_rect: (rend :i64, rect_ptr :i64) :bool {
 }
 
 pub fn set_clip_rect_xywh: (rend :i64, x :i64, y :i64, w :i64, h :i64) :bool {
-    set rect = create_rect(x y w h)
+    set rect = use! render::create_rect(x y w h)
     if rect == 0 { return false }
     set ok = SDL_SetRenderClipRect(rend rect)
-    destroy_rect(rect)
+    use! render::destroy_rect(rect)
     return ok
 }
 
@@ -333,16 +335,16 @@ pub fn rect_set_w: (rect_ptr :i64, w :i64) { rt_write_u32(rect_ptr + 8, w) }
 pub fn rect_set_h: (rect_ptr :i64, h :i64) { rt_write_u32(rect_ptr + 12, h) }
 
 pub fn render_texture_xywh: (rend :i64, tex :i64, src_x :i64, src_y :i64, src_w :i64, src_h :i64, dst_x :i64, dst_y :i64, dst_w :i64, dst_h :i64) :bool {
-    set src = create_rect(src_x src_y src_w src_h)
+    set src = use! render::create_rect(src_x src_y src_w src_h)
     if src == 0 { return false }
-    set dst = create_rect(dst_x dst_y dst_w dst_h)
+    set dst = use! render::create_rect(dst_x dst_y dst_w dst_h)
     if dst == 0 {
-        destroy_rect(src)
+        use! render::destroy_rect(src)
         return false
     }
     set ok = SDL_RenderTexture(rend tex src dst)
-    destroy_rect(src)
-    destroy_rect(dst)
+    use! render::destroy_rect(src)
+    use! render::destroy_rect(dst)
     return ok
 }
 
@@ -352,11 +354,11 @@ pub fn render_texture_xywh: (rend :i64, tex :i64, src_x :i64, src_y :i64, src_w 
 pub fn vertex_size: () :i64 { return 32 }
 
 pub fn create_vertex: (x :f64, y :f64, r :f64, g :f64, b :f64, a :f64, u :f64, v :f64) :i64 {
-    set ptr = rt_alloc_raw(vertex_size())
+    set ptr = rt_alloc_raw(use! render::vertex_size())
     if ptr == 0 { return 0 }
-    vertex_set_position(ptr, x, y)
-    vertex_set_color(ptr, r, g, b, a)
-    vertex_set_texcoord(ptr, u, v)
+    use! render::vertex_set_position(ptr, x, y)
+    use! render::vertex_set_color(ptr, r, g, b, a)
+    use! render::vertex_set_texcoord(ptr, u, v)
     return ptr
 }
 
@@ -387,7 +389,7 @@ pub fn render_geometry: (rend :i64, tex :i64, vertices_ptr :i64, num_vertices :i
 pub fn fpoint_size: () :i64 { return 8 }
 
 pub fn create_fpoint: (x :f64, y :f64) :i64 {
-    set ptr = rt_alloc_raw(fpoint_size())
+    set ptr = rt_alloc_raw(use! render::fpoint_size())
     if ptr == 0 { return 0 }
     rt_write_f32(ptr, x)
     rt_write_f32(ptr + 4, y)

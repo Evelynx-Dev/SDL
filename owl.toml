@@ -1,6 +1,6 @@
 [project]
 name = "sdl"
-version = "1.2.0"
+version = "1.3.0"
 description = "SDL bindings for Mire (SDL2 + SDL3)"
 entry = "code/mod.mire"
 

@@ -33,16 +33,50 @@ pub fn event_type_mouse_motion: () :i64 { return 0x400 }
 pub fn event_type_mouse_button_down: () :i64 { return 0x401 }
 pub fn event_type_mouse_button_up: () :i64 { return 0x402 }
 pub fn event_type_mouse_wheel: () :i64 { return 0x403 }
-pub fn event_type_finger_down: () :i64 { return 0x500 }
-pub fn event_type_finger_up: () :i64 { return 0x501 }
-pub fn event_type_finger_motion: () :i64 { return 0x502 }
+pub fn event_type_finger_down: () :i64 { return 0x700 }
+pub fn event_type_finger_up: () :i64 { return 0x701 }
+pub fn event_type_finger_motion: () :i64 { return 0x702 }
+pub fn event_type_finger_canceled: () :i64 { return 0x703 }
 pub fn event_type_clipboard_update: () :i64 { return 0x600 }
-pub fn event_type_drop_file: () :i64 { return 0x700 }
-pub fn event_type_drop_text: () :i64 { return 0x701 }
-pub fn event_type_audio_device_added: () :i64 { return 0x800 }
-pub fn event_type_audio_device_removed: () :i64 { return 0x801 }
-pub fn event_type_display_event: () :i64 { return 0x900 }
-pub fn event_type_render_device_reset: () :i64 { return 0xA00 }
+pub fn event_type_drop_file: () :i64 { return 0x1000 }
+pub fn event_type_drop_text: () :i64 { return 0x1001 }
+pub fn event_type_drop_begin: () :i64 { return 0x1002 }
+pub fn event_type_drop_complete: () :i64 { return 0x1003 }
+pub fn event_type_drop_position: () :i64 { return 0x1004 }
+pub fn event_type_audio_device_added: () :i64 { return 0x1100 }
+pub fn event_type_audio_device_removed: () :i64 { return 0x1101 }
+pub fn event_type_audio_device_format_changed: () :i64 { return 0x1102 }
+pub fn event_type_display_orientation: () :i64 { return 0x151 }
+pub fn event_type_display_added: () :i64 { return 0x152 }
+pub fn event_type_display_removed: () :i64 { return 0x153 }
+pub fn event_type_display_moved: () :i64 { return 0x154 }
+pub fn event_type_display_desktop_mode_changed: () :i64 { return 0x155 }
+pub fn event_type_display_current_mode_changed: () :i64 { return 0x156 }
+pub fn event_type_display_content_scale_changed: () :i64 { return 0x157 }
+pub fn event_type_display_usable_bounds_changed: () :i64 { return 0x158 }
+pub fn event_type_joystick_axis_motion: () :i64 { return 0x600 }
+pub fn event_type_joystick_ball_motion: () :i64 { return 0x601 }
+pub fn event_type_joystick_hat_motion: () :i64 { return 0x602 }
+pub fn event_type_joystick_button_down: () :i64 { return 0x603 }
+pub fn event_type_joystick_button_up: () :i64 { return 0x604 }
+pub fn event_type_joystick_added: () :i64 { return 0x605 }
+pub fn event_type_joystick_removed: () :i64 { return 0x606 }
+pub fn event_type_joystick_battery_updated: () :i64 { return 0x607 }
+pub fn event_type_joystick_update_complete: () :i64 { return 0x608 }
+pub fn event_type_gamepad_axis_motion: () :i64 { return 0x650 }
+pub fn event_type_gamepad_button_down: () :i64 { return 0x651 }
+pub fn event_type_gamepad_button_up: () :i64 { return 0x652 }
+pub fn event_type_gamepad_added: () :i64 { return 0x653 }
+pub fn event_type_gamepad_removed: () :i64 { return 0x654 }
+pub fn event_type_gamepad_remapped: () :i64 { return 0x655 }
+pub fn event_type_gamepad_touchpad_down: () :i64 { return 0x656 }
+pub fn event_type_gamepad_touchpad_motion: () :i64 { return 0x657 }
+pub fn event_type_gamepad_touchpad_up: () :i64 { return 0x658 }
+pub fn event_type_gamepad_sensor_update: () :i64 { return 0x659 }
+pub fn event_type_sensor_update: () :i64 { return 0x1200 }
+pub fn event_type_render_targets_reset: () :i64 { return 0x2000 }
+pub fn event_type_render_device_reset: () :i64 { return 0x2001 }
+pub fn event_type_render_device_lost: () :i64 { return 0x2002 }
 pub fn event_type_user_event: () :i64 { return 0x8000 }
 
 // ── Window event types (SDL3 SDL_EventType values) ────────────────
@@ -77,7 +111,7 @@ pub fn window_event_destroyed: () :i64 { return 0x219 }
 pub fn event_size: () :i64 { return 128 }
 
 pub fn allocate_event: () :i64 {
-    set ptr = rt_alloc_raw(event_size())
+    set ptr = rt_alloc_raw(use! events::event_size())
     return ptr
 }
 
@@ -231,8 +265,8 @@ pub fn mouse_motion_yrel: (buf :i64) :f64 {
 //   offset 24: x (f32) — horizontal scroll amount
 //   offset 28: y (f32) — vertical scroll amount
 //   offset 32: direction (u32)
-//   offset 36: mouse_x (f32) — cursor position
-//   offset 40: mouse_y (f32)
+//   offset 36: use! events::mouse_x (f32) — cursor position
+//   offset 40: use! events::mouse_y (f32)
 //   offset 44: integer_x (i32) — whole scroll ticks
 //   offset 48: integer_y (i32)
 
@@ -266,3 +300,184 @@ pub fn mouse_middle: () :i64 { return 2 }
 pub fn mouse_right: () :i64 { return 3 }
 pub fn mouse_x1: () :i64 { return 4 }
 pub fn mouse_x2: () :i64 { return 5 }
+
+// ── Finger (touch) event fields ─────────────────────────────────────
+// SDL_TouchFingerEvent:
+//   offset  0: type (u32)
+//   offset  4: reserved (u32)
+//   offset  8: timestamp (u64)
+//   offset 16: touchID (i64)
+//   offset 24: fingerID (i64)
+//   offset 32: x (f32) — normalized 0..1
+//   offset 36: y (f32) — normalized 0..1
+//   offset 40: dx (f32) — normalized -1..1
+//   offset 44: dy (f32) — normalized -1..1
+//   offset 48: pressure (f32) — normalized 0..1
+//   offset 52: windowID (u32)
+
+pub fn finger_touch_id: (buf :i64) :i64 {
+    return rt_read_u64(buf + 16)
+}
+
+pub fn finger_id: (buf :i64) :i64 {
+    return rt_read_u64(buf + 24)
+}
+
+pub fn finger_x: (buf :i64) :f64 {
+    return rt_read_f32(buf + 32)
+}
+
+pub fn finger_y: (buf :i64) :f64 {
+    return rt_read_f32(buf + 36)
+}
+
+pub fn finger_dx: (buf :i64) :f64 {
+    return rt_read_f32(buf + 40)
+}
+
+pub fn finger_dy: (buf :i64) :f64 {
+    return rt_read_f32(buf + 44)
+}
+
+pub fn finger_pressure: (buf :i64) :f64 {
+    return rt_read_f32(buf + 48)
+}
+
+// ── Drop event fields ───────────────────────────────────────────────
+// SDL_DropEvent:
+//   offset  0: type (u32)
+//   offset  4: reserved (u32)
+//   offset  8: timestamp (u64)
+//   offset 16: windowID (u32)
+//   offset 20: padding
+//   offset 24: x (f32)
+//   offset 28: y (f32)
+//   offset 32: source (ptr)
+//   offset 40: data (ptr)
+
+pub fn drop_x: (buf :i64) :f64 {
+    return rt_read_f32(buf + 24)
+}
+
+pub fn drop_y: (buf :i64) :f64 {
+    return rt_read_f32(buf + 28)
+}
+
+pub fn drop_source: (buf :i64) :str {
+    set ptr = rt_read_ptr(buf + 32)
+    if ptr == 0 { return "" }
+    return rt_read_cstr(ptr)
+}
+
+pub fn drop_data: (buf :i64) :str {
+    set ptr = rt_read_ptr(buf + 40)
+    if ptr == 0 { return "" }
+    return rt_read_cstr(ptr)
+}
+
+// ── Display event fields ────────────────────────────────────────────
+// SDL_DisplayEvent:
+//   offset  0: type (u32)
+//   offset  4: reserved (u32)
+//   offset  8: timestamp (u64)
+//   offset 16: displayID (u32)
+//   offset 20: data1 (i32)
+//   offset 24: data2 (i32)
+
+pub fn display_event_id: (buf :i64) :i64 {
+    return rt_read_u32(buf + 16)
+}
+
+pub fn display_event_data1: (buf :i64) :i64 {
+    return rt_read_i32(buf + 20)
+}
+
+pub fn display_event_data2: (buf :i64) :i64 {
+    return rt_read_i32(buf + 24)
+}
+
+// ── Audio device event fields ───────────────────────────────────────
+// SDL_AudioDeviceEvent:
+//   offset  0: type (u32)
+//   offset  4: reserved (u32)
+//   offset  8: timestamp (u64)
+//   offset 16: which (u32) — device ID
+//   offset 20: recording (u8) — bool
+
+pub fn audio_device_which: (buf :i64) :i64 {
+    return rt_read_u32(buf + 16)
+}
+
+pub fn audio_device_recording: (buf :i64) :bool {
+    return rt_read_u8(buf + 20) != 0
+}
+
+// ── Joystick event fields ───────────────────────────────────────────
+// SDL_JoyAxisEvent:
+//   offset 16: which (i64) — joystick instance id
+//   offset 24: axis (u8)
+//   offset 28: value (i16)
+pub fn joystick_axis_which: (buf :i64) :i64 { return rt_read_u64(buf + 16) }
+pub fn joystick_axis_index: (buf :i64) :i64 { return rt_read_u8(buf + 24) }
+pub fn joystick_axis_value: (buf :i64) :i64 { return rt_read_u16(buf + 28) }
+
+// SDL_JoyHatEvent:
+//   offset 16: which (i64)
+//   offset 24: hat (u8)
+//   offset 25: value (u8)
+pub fn joystick_hat_which: (buf :i64) :i64 { return rt_read_u64(buf + 16) }
+pub fn joystick_hat_index: (buf :i64) :i64 { return rt_read_u8(buf + 24) }
+pub fn joystick_hat_value: (buf :i64) :i64 { return rt_read_u8(buf + 25) }
+
+// SDL_JoyButtonEvent:
+//   offset 16: which (i64)
+//   offset 24: button (u8)
+//   offset 25: down (u8) — bool
+pub fn joystick_button_which: (buf :i64) :i64 { return rt_read_u64(buf + 16) }
+pub fn joystick_button_index: (buf :i64) :i64 { return rt_read_u8(buf + 24) }
+pub fn joystick_button_down: (buf :i64) :bool { return rt_read_u8(buf + 25) != 0 }
+
+// SDL_JoyDeviceEvent:
+//   offset 16: which (i64)
+pub fn joystick_device_which: (buf :i64) :i64 { return rt_read_u64(buf + 16) }
+
+// ── Gamepad event fields ────────────────────────────────────────────
+// SDL_GamepadAxisEvent:
+//   offset 16: which (i64)
+//   offset 24: axis (u8)
+//   offset 28: value (i16)
+pub fn gamepad_axis_which: (buf :i64) :i64 { return rt_read_u64(buf + 16) }
+pub fn gamepad_axis_index: (buf :i64) :i64 { return rt_read_u8(buf + 24) }
+pub fn gamepad_axis_value: (buf :i64) :i64 { return rt_read_u16(buf + 28) }
+
+// SDL_GamepadButtonEvent:
+//   offset 16: which (i64)
+//   offset 24: button (u8)
+//   offset 25: down (u8) — bool
+pub fn gamepad_button_which: (buf :i64) :i64 { return rt_read_u64(buf + 16) }
+pub fn gamepad_button_index: (buf :i64) :i64 { return rt_read_u8(buf + 24) }
+pub fn gamepad_button_down: (buf :i64) :bool { return rt_read_u8(buf + 25) != 0 }
+
+// SDL_GamepadDeviceEvent:
+//   offset 16: which (i64)
+pub fn gamepad_device_which: (buf :i64) :i64 { return rt_read_u64(buf + 16) }
+
+// ── Sensor event fields ─────────────────────────────────────────────
+// SDL_SensorEvent:
+//   offset 16: which (i64) — sensor instance id
+//   offset 24: sensor_timestamp (u64)
+//   offset 32: data[6] (f32 × 6) — sensor data values
+pub fn sensor_which: (buf :i64) :i64 { return rt_read_u64(buf + 16) }
+pub fn sensor_timestamp: (buf :i64) :i64 { return rt_read_u64(buf + 24) }
+pub fn sensor_data: (buf :i64, idx :i64) :f64 { return rt_read_f32(buf + 32 + idx * 4) }
+
+// ── Joystick hat constants ──────────────────────────────────────────
+pub fn hat_centered: () :i64 { return 0x00 }
+pub fn hat_up: () :i64 { return 0x01 }
+pub fn hat_right: () :i64 { return 0x02 }
+pub fn hat_down: () :i64 { return 0x04 }
+pub fn hat_left: () :i64 { return 0x08 }
+pub fn hat_rightup: () :i64 { return 0x03 }
+pub fn hat_rightdown: () :i64 { return 0x06 }
+pub fn hat_leftup: () :i64 { return 0x09 }
+pub fn hat_leftdown: () :i64 { return 0x0C }

@@ -1,0 +1,60 @@
+module sensor
+
+extern lib "SDL3"
+
+extern fn SDL_GetSensors: (count_ptr :i64) :i64 lib "SDL3"
+extern fn SDL_GetSensorNameForID: (instance_id :i64) :str lib "SDL3"
+extern fn SDL_GetSensorTypeForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetSensorNonPortableTypeForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_OpenSensor: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetSensorFromID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetSensorName: (sensor :i64) :str lib "SDL3"
+extern fn SDL_GetSensorType: (sensor :i64) :i64 lib "SDL3"
+extern fn SDL_GetSensorNonPortableType: (sensor :i64) :i64 lib "SDL3"
+extern fn SDL_GetSensorID: (sensor :i64) :i64 lib "SDL3"
+extern fn SDL_GetSensorData: (sensor :i64, data_ptr :i64, num_values :i64) :bool lib "SDL3"
+extern fn SDL_CloseSensor: (sensor :i64) lib "SDL3"
+extern fn SDL_UpdateSensors: () lib "SDL3"
+
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
+
+pub fn get_count: () :i64 {
+    set count_ptr = rt_alloc_raw(4)
+    if count_ptr == 0 { return 0 }
+    SDL_GetSensors(count_ptr)
+    set count = rt_read_u32(count_ptr)
+    rt_free_raw(count_ptr)
+    return count
+}
+
+pub fn get_name_for_id: (instance_id :i64) :str { return SDL_GetSensorNameForID(instance_id) }
+pub fn get_type_for_id: (instance_id :i64) :i64 { return SDL_GetSensorTypeForID(instance_id) }
+pub fn get_non_portable_type_for_id: (instance_id :i64) :i64 { return SDL_GetSensorNonPortableTypeForID(instance_id) }
+
+pub fn open: (instance_id :i64) :i64 { return SDL_OpenSensor(instance_id) }
+pub fn get_from_id: (instance_id :i64) :i64 { return SDL_GetSensorFromID(instance_id) }
+pub fn close: (sensor :i64) { SDL_CloseSensor(sensor) }
+
+pub fn get_name: (sensor :i64) :str { return SDL_GetSensorName(sensor) }
+pub fn get_type: (sensor :i64) :i64 { return SDL_GetSensorType(sensor) }
+pub fn get_non_portable_type: (sensor :i64) :i64 { return SDL_GetSensorNonPortableType(sensor) }
+pub fn get_id: (sensor :i64) :i64 { return SDL_GetSensorID(sensor) }
+
+// Get sensor data into a pre-allocated buffer. Returns true on success.
+// num_values typically 3 (accel) or 4 (gyro).
+pub fn get_data: (sensor :i64, data_ptr :i64, num_values :i64) :bool {
+    return SDL_GetSensorData(sensor data_ptr num_values)
+}
+
+pub fn update: () { SDL_UpdateSensors() }
+
+// ── Sensor type constants ───────────────────────────────────────────
+pub fn type_unknown: () :i64 { return 0 }
+pub fn type_accelerometer: () :i64 { return 1 }
+pub fn type_gyroscope: () :i64 { return 2 }
+pub fn type_accelerometer_left: () :i64 { return 3 }
+pub fn type_gyroscope_left: () :i64 { return 4 }
+pub fn type_accelerometer_right: () :i64 { return 5 }
+pub fn type_gyroscope_right: () :i64 { return 6 }

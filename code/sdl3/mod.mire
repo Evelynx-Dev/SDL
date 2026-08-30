@@ -17,6 +17,10 @@ load sdl::sdl3::misc
 load sdl::sdl3::cpuinfo
 load sdl::sdl3::structs
 load sdl::sdl3::font
+load sdl::sdl3::joystick
+load sdl::sdl3::gamepad
+load sdl::sdl3::haptic
+load sdl::sdl3::sensor
 
 extern lib "SDL3"
 

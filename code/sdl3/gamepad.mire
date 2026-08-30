@@ -1,0 +1,129 @@
+module gamepad
+
+extern lib "SDL3"
+
+extern fn SDL_HasGamepad: () :bool lib "SDL3"
+extern fn SDL_GetGamepads: (count_ptr :i64) :i64 lib "SDL3"
+extern fn SDL_IsGamepad: (instance_id :i64) :bool lib "SDL3"
+extern fn SDL_GetGamepadNameForID: (instance_id :i64) :str lib "SDL3"
+extern fn SDL_GetGamepadPathForID: (instance_id :i64) :str lib "SDL3"
+extern fn SDL_GetGamepadPlayerIndexForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadVendorForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadProductForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadProductVersionForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadTypeForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_OpenGamepad: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadFromID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_CloseGamepad: (gamepad :i64) lib "SDL3"
+extern fn SDL_GetGamepadID: (gamepad :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadName: (gamepad :i64) :str lib "SDL3"
+extern fn SDL_GetGamepadPath: (gamepad :i64) :str lib "SDL3"
+extern fn SDL_GetGamepadPlayerIndex: (gamepad :i64) :i64 lib "SDL3"
+extern fn SDL_SetGamepadPlayerIndex: (gamepad :i64, player_index :i64) :bool lib "SDL3"
+extern fn SDL_GetGamepadVendor: (gamepad :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadProduct: (gamepad :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadProductVersion: (gamepad :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadType: (gamepad :i64) :i64 lib "SDL3"
+extern fn SDL_GetRealGamepadType: (gamepad :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadMapping: (gamepad :i64) :str lib "SDL3"
+extern fn SDL_SetGamepadMapping: (instance_id :i64, mapping :str) :bool lib "SDL3"
+extern fn SDL_GetGamepadAxis: (gamepad :i64, axis :i64) :i64 lib "SDL3"
+extern fn SDL_GetGamepadButton: (gamepad :i64, button :i64) :bool lib "SDL3"
+extern fn SDL_GetGamepadSensorDataRate: (gamepad :i64, sensor_type :i64) :f64 lib "SDL3"
+extern fn SDL_GamepadHasSensor: (gamepad :i64, sensor_type :i64) :bool lib "SDL3"
+extern fn SDL_SetGamepadSensorEnabled: (gamepad :i64, sensor_type :i64, enabled :bool) :bool lib "SDL3"
+extern fn SDL_GetGamepadTouchpadFinger: (gamepad :i64, touchpad :i64, finger :i64, state_ptr :i64, x_ptr :i64, y_ptr :i64, pressure_ptr :i64) :bool lib "SDL3"
+extern fn SDL_RumbleGamepad: (gamepad :i64, low_frequency :i64, high_frequency :i64, duration_ms :i64) :bool lib "SDL3"
+extern fn SDL_RumbleGamepadTriggers: (gamepad :i64, left :i64, right :i64, duration_ms :i64) :bool lib "SDL3"
+extern fn SDL_SetGamepadLED: (gamepad :i64, r :i64, g :i64, b :i64) :bool lib "SDL3"
+extern fn SDL_SendGamepadEffect: (gamepad :i64, data :i64, size :i64) :bool lib "SDL3"
+extern fn SDL_AddGamepadMapping: (mapping :str) :i64 lib "SDL3"
+extern fn SDL_AddGamepadMappingsFromFile: (file :str) :i64 lib "SDL3"
+extern fn SDL_ReloadGamepadMappings: () :bool lib "SDL3"
+
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
+
+pub fn has_gamepad: () :bool { return SDL_HasGamepad() }
+
+pub fn get_count: () :i64 {
+    set count_ptr = rt_alloc_raw(4)
+    if count_ptr == 0 { return 0 }
+    SDL_GetGamepads(count_ptr)
+    set count = rt_read_u32(count_ptr)
+    rt_free_raw(count_ptr)
+    return count
+}
+
+pub fn is_gamepad: (instance_id :i64) :bool { return SDL_IsGamepad(instance_id) }
+pub fn get_name_for_id: (instance_id :i64) :str { return SDL_GetGamepadNameForID(instance_id) }
+pub fn get_path_for_id: (instance_id :i64) :str { return SDL_GetGamepadPathForID(instance_id) }
+pub fn get_player_index_for_id: (instance_id :i64) :i64 { return SDL_GetGamepadPlayerIndexForID(instance_id) }
+pub fn get_vendor_for_id: (instance_id :i64) :i64 { return SDL_GetGamepadVendorForID(instance_id) }
+pub fn get_product_for_id: (instance_id :i64) :i64 { return SDL_GetGamepadProductForID(instance_id) }
+pub fn get_product_version_for_id: (instance_id :i64) :i64 { return SDL_GetGamepadProductVersionForID(instance_id) }
+pub fn get_type_for_id: (instance_id :i64) :i64 { return SDL_GetGamepadTypeForID(instance_id) }
+
+pub fn open: (instance_id :i64) :i64 { return SDL_OpenGamepad(instance_id) }
+pub fn close: (gamepad :i64) { SDL_CloseGamepad(gamepad) }
+
+pub fn get_id: (gamepad :i64) :i64 { return SDL_GetGamepadID(gamepad) }
+pub fn get_name: (gamepad :i64) :str { return SDL_GetGamepadName(gamepad) }
+pub fn get_path: (gamepad :i64) :str { return SDL_GetGamepadPath(gamepad) }
+pub fn get_player_index: (gamepad :i64) :i64 { return SDL_GetGamepadPlayerIndex(gamepad) }
+pub fn set_player_index: (gamepad :i64, idx :i64) :bool { return SDL_SetGamepadPlayerIndex(gamepad idx) }
+pub fn get_vendor: (gamepad :i64) :i64 { return SDL_GetGamepadVendor(gamepad) }
+pub fn get_product: (gamepad :i64) :i64 { return SDL_GetGamepadProduct(gamepad) }
+pub fn get_product_version: (gamepad :i64) :i64 { return SDL_GetGamepadProductVersion(gamepad) }
+pub fn get_type: (gamepad :i64) :i64 { return SDL_GetGamepadType(gamepad) }
+pub fn get_real_type: (gamepad :i64) :i64 { return SDL_GetRealGamepadType(gamepad) }
+pub fn get_mapping: (gamepad :i64) :str { return SDL_GetGamepadMapping(gamepad) }
+pub fn set_mapping: (instance_id :i64, mapping :str) :bool { return SDL_SetGamepadMapping(instance_id mapping) }
+
+pub fn get_axis: (gamepad :i64, axis :i64) :i64 { return SDL_GetGamepadAxis(gamepad axis) }
+pub fn get_button: (gamepad :i64, button :i64) :bool { return SDL_GetGamepadButton(gamepad button) }
+
+pub fn has_sensor: (gamepad :i64, sensor_type :i64) :bool { return SDL_GamepadHasSensor(gamepad sensor_type) }
+pub fn set_sensor_enabled: (gamepad :i64, sensor_type :i64, enabled :bool) :bool { return SDL_SetGamepadSensorEnabled(gamepad sensor_type enabled) }
+pub fn get_sensor_data_rate: (gamepad :i64, sensor_type :i64) :f64 { return SDL_GetGamepadSensorDataRate(gamepad sensor_type) }
+
+pub fn rumble: (gamepad :i64, low :i64, high :i64, duration_ms :i64) :bool { return SDL_RumbleGamepad(gamepad low high duration_ms) }
+pub fn rumble_triggers: (gamepad :i64, left :i64, right :i64, duration_ms :i64) :bool { return SDL_RumbleGamepadTriggers(gamepad left right duration_ms) }
+pub fn set_led: (gamepad :i64, r :i64, g :i64, b :i64) :bool { return SDL_SetGamepadLED(gamepad r g b) }
+pub fn send_effect: (gamepad :i64, data :i64, size :i64) :bool { return SDL_SendGamepadEffect(gamepad data size) }
+
+pub fn add_mapping: (mapping :str) :i64 { return SDL_AddGamepadMapping(mapping) }
+pub fn add_mappings_from_file: (file :str) :i64 { return SDL_AddGamepadMappingsFromFile(file) }
+pub fn reload_mappings: () :bool { return SDL_ReloadGamepadMappings() }
+
+// ── Gamepad axis constants ──────────────────────────────────────────
+pub fn axis_left_x: () :i64 { return 0 }
+pub fn axis_left_y: () :i64 { return 1 }
+pub fn axis_right_x: () :i64 { return 2 }
+pub fn axis_right_y: () :i64 { return 3 }
+pub fn axis_left_trigger: () :i64 { return 4 }
+pub fn axis_right_trigger: () :i64 { return 5 }
+
+// ── Gamepad button constants ────────────────────────────────────────
+pub fn button_a: () :i64 { return 0 }
+pub fn button_b: () :i64 { return 1 }
+pub fn button_x: () :i64 { return 2 }
+pub fn button_y: () :i64 { return 3 }
+pub fn button_back: () :i64 { return 4 }
+pub fn button_guide: () :i64 { return 5 }
+pub fn button_start: () :i64 { return 6 }
+pub fn button_left_stick: () :i64 { return 7 }
+pub fn button_right_stick: () :i64 { return 8 }
+pub fn button_left_shoulder: () :i64 { return 9 }
+pub fn button_right_shoulder: () :i64 { return 10 }
+pub fn button_dpad_up: () :i64 { return 11 }
+pub fn button_dpad_down: () :i64 { return 12 }
+pub fn button_dpad_left: () :i64 { return 13 }
+pub fn button_dpad_right: () :i64 { return 14 }
+pub fn button_misc1: () :i64 { return 15 }
+pub fn button_paddle1: () :i64 { return 16 }
+pub fn button_paddle2: () :i64 { return 17 }
+pub fn button_paddle3: () :i64 { return 18 }
+pub fn button_paddle4: () :i64 { return 19 }
+pub fn button_touchpad: () :i64 { return 20 }

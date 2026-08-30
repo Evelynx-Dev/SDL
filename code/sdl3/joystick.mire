@@ -1,0 +1,124 @@
+module joystick
+
+extern lib "SDL3"
+
+extern fn SDL_HasJoystick: () :bool lib "SDL3"
+extern fn SDL_GetJoysticks: (count_ptr :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickNameForID: (instance_id :i64) :str lib "SDL3"
+extern fn SDL_GetJoystickPathForID: (instance_id :i64) :str lib "SDL3"
+extern fn SDL_GetJoystickPlayerIndexForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickVendorForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickProductForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickProductVersionForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickTypeForID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_OpenJoystick: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickFromID: (instance_id :i64) :i64 lib "SDL3"
+extern fn SDL_CloseJoystick: (joystick :i64) lib "SDL3"
+extern fn SDL_GetJoystickID: (joystick :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickName: (joystick :i64) :str lib "SDL3"
+extern fn SDL_GetJoystickPath: (joystick :i64) :str lib "SDL3"
+extern fn SDL_GetJoystickPlayerIndex: (joystick :i64) :i64 lib "SDL3"
+extern fn SDL_SetJoystickPlayerIndex: (joystick :i64, player_index :i64) :bool lib "SDL3"
+extern fn SDL_GetJoystickVendor: (joystick :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickProduct: (joystick :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickProductVersion: (joystick :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickType: (joystick :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickAxis: (joystick :i64, axis :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickAxisInitialState: (joystick :i64, axis :i64, state_ptr :i64) :bool lib "SDL3"
+extern fn SDL_GetJoystickButton: (joystick :i64, button :i64) :bool lib "SDL3"
+extern fn SDL_GetJoystickHat: (joystick :i64, hat :i64) :i64 lib "SDL3"
+extern fn SDL_GetJoystickBall: (joystick :i64, ball :i64, dx_ptr :i64, dy_ptr :i64) :bool lib "SDL3"
+extern fn SDL_SetJoystickVirtualAxis: (joystick :i64, axis :i64, value :i64) :bool lib "SDL3"
+extern fn SDL_SetJoystickVirtualButton: (joystick :i64, button :i64, down :bool) :bool lib "SDL3"
+extern fn SDL_SetJoystickVirtualHat: (joystick :i64, hat :i64, value :i64) :bool lib "SDL3"
+extern fn SDL_SetJoystickVirtualTouchpad: (joystick :i64, touchpad :i64, finger :i64, down :bool, x :f64, y :f64, pressure :f64) :bool lib "SDL3"
+extern fn SDL_IsJoystickVirtual: (instance_id :i64) :bool lib "SDL3"
+extern fn SDL_AttachVirtualJoystick: (desc :i64) :i64 lib "SDL3"
+extern fn SDL_DetachVirtualJoystick: (instance_id :i64) :bool lib "SDL3"
+extern fn SDL_LockJoysticks: () lib "SDL3"
+extern fn SDL_UnlockJoysticks: () lib "SDL3"
+
+extern fn rt_alloc_raw: (size :i64) :i64 lib "c"
+extern fn rt_free_raw: (ptr :i64) lib "c"
+extern fn rt_write_u32: (ptr :i64, val :i64) lib "c"
+extern fn rt_read_u32: (ptr :i64) :i64 lib "c"
+extern fn rt_read_u64: (ptr :i64) :i64 lib "c"
+extern fn rt_read_ptr: (ptr :i64) :i64 lib "c"
+
+pub fn has_joystick: () :bool { return SDL_HasJoystick() }
+
+pub fn get_joysticks: () :i64 {
+    set count_ptr = rt_alloc_raw(4)
+    if count_ptr == 0 { return 0 }
+    set list = SDL_GetJoysticks(count_ptr)
+    set count = rt_read_u32(count_ptr)
+    rt_free_raw(count_ptr)
+    // returns pointer to array of i32 instance IDs; caller must free
+    return list
+}
+
+pub fn get_count: () :i64 {
+    set count_ptr = rt_alloc_raw(4)
+    if count_ptr == 0 { return 0 }
+    SDL_GetJoysticks(count_ptr)
+    set count = rt_read_u32(count_ptr)
+    rt_free_raw(count_ptr)
+    return count
+}
+
+pub fn get_name_for_id: (instance_id :i64) :str { return SDL_GetJoystickNameForID(instance_id) }
+pub fn get_path_for_id: (instance_id :i64) :str { return SDL_GetJoystickPathForID(instance_id) }
+pub fn get_player_index_for_id: (instance_id :i64) :i64 { return SDL_GetJoystickPlayerIndexForID(instance_id) }
+pub fn get_vendor_for_id: (instance_id :i64) :i64 { return SDL_GetJoystickVendorForID(instance_id) }
+pub fn get_product_for_id: (instance_id :i64) :i64 { return SDL_GetJoystickProductForID(instance_id) }
+pub fn get_product_version_for_id: (instance_id :i64) :i64 { return SDL_GetJoystickProductVersionForID(instance_id) }
+pub fn get_type_for_id: (instance_id :i64) :i64 { return SDL_GetJoystickTypeForID(instance_id) }
+
+pub fn open: (instance_id :i64) :i64 { return SDL_OpenJoystick(instance_id) }
+pub fn close: (joystick :i64) { SDL_CloseJoystick(joystick) }
+
+pub fn get_id: (joystick :i64) :i64 { return SDL_GetJoystickID(joystick) }
+pub fn get_name: (joystick :i64) :str { return SDL_GetJoystickName(joystick) }
+pub fn get_path: (joystick :i64) :str { return SDL_GetJoystickPath(joystick) }
+pub fn get_player_index: (joystick :i64) :i64 { return SDL_GetJoystickPlayerIndex(joystick) }
+pub fn set_player_index: (joystick :i64, idx :i64) :bool { return SDL_SetJoystickPlayerIndex(joystick idx) }
+pub fn get_vendor: (joystick :i64) :i64 { return SDL_GetJoystickVendor(joystick) }
+pub fn get_product: (joystick :i64) :i64 { return SDL_GetJoystickProduct(joystick) }
+pub fn get_product_version: (joystick :i64) :i64 { return SDL_GetJoystickProductVersion(joystick) }
+pub fn get_type: (joystick :i64) :i64 { return SDL_GetJoystickType(joystick) }
+
+pub fn get_axis: (joystick :i64, axis :i64) :i64 { return SDL_GetJoystickAxis(joystick axis) }
+pub fn get_axis_initial_state: (joystick :i64, axis :i64) :i64 {
+    set state_ptr = rt_alloc_raw(4)
+    if state_ptr == 0 { return 0 }
+    SDL_GetJoystickAxisInitialState(joystick axis state_ptr)
+    set val = rt_read_u32(state_ptr)
+    rt_free_raw(state_ptr)
+    return val
+}
+
+pub fn get_button: (joystick :i64, button :i64) :bool { return SDL_GetJoystickButton(joystick button) }
+pub fn get_hat: (joystick :i64, hat :i64) :i64 { return SDL_GetJoystickHat(joystick hat) }
+
+pub fn set_virtual_axis: (joystick :i64, axis :i64, value :i64) :bool { return SDL_SetJoystickVirtualAxis(joystick axis value) }
+pub fn set_virtual_button: (joystick :i64, button :i64, down :bool) :bool { return SDL_SetJoystickVirtualButton(joystick button down) }
+pub fn set_virtual_hat: (joystick :i64, hat :i64, value :i64) :bool { return SDL_SetJoystickVirtualHat(joystick hat value) }
+
+pub fn is_virtual: (instance_id :i64) :bool { return SDL_IsJoystickVirtual(instance_id) }
+
+pub fn lock: () { SDL_LockJoysticks() }
+pub fn unlock: () { SDL_UnlockJoysticks() }
+
+// ── Joystick type constants ─────────────────────────────────────────
+pub fn type_unknown: () :i64 { return 0 }
+pub fn type_gamepad: () :i64 { return 1 }
+pub fn type_wheel: () :i64 { return 2 }
+pub fn type_arctStick: () :i64 { return 3 }
+pub fn type_flightStick: () :i64 { return 4 }
+pub fn type_dancePad: () :i64 { return 5 }
+pub fn type_guitar: () :i64 { return 6 }
+pub fn type_drumKit: () :i64 { return 7 }
+pub fn type_dancePadAlternate: () :i64 { return 8 }
+pub fn type_guitarAlternate: () :i64 { return 9 }
+pub fn type_ddrum: () :i64 { return 10 }
+pub fn type_arcadePad: () :i64 { return 11 }
