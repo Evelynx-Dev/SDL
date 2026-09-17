@@ -1,6 +1,6 @@
 [project]
 name = "sdl"
-version = "1.3.0"
+version = "1.3.1"
 description = "SDL bindings for Mire (SDL2 + SDL3)"
 entry = "code/mod.mire"
 
@@ -8,14 +8,30 @@ entry = "code/mod.mire"
 compiler = "mire"
 profile = "debug"
 opt-level = 0
+artifact = "shared"
+runtime = "full"
+target = "x86_64-unknown-linux-gnu"
+panic = "abort"
+incremental = true
+debug-info = true
 
 [paths]
 sources = "code"
 tests = "tests"
 output = "bin"
 cache = "bin/.cache"
+source = "code"
+test = "tests"
+bin = "bin"
+generated = "bin/generated"
+
+[cfg]
+publisher = "publish.toml"
+registry = "mor"
 
 [dependencies]
+mire = { path = "~/.owl/libs/mire" }
+kioto = { path = "~/.owl/libs/kioto" }
 sdl = { path = "." }
 
 [exports]

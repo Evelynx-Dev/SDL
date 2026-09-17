@@ -1,6 +1,6 @@
 # sdl — SDL2 + SDL3 bindings for Mire
 
-Version **1.2.0** — [CHANGELOG](docs/CHANGELOG.md)
+Version **1.3.1** — [CHANGELOG](docs/CHANGELOG.md)
 
 SDL bindings for the Mire language ecosystem. Exposes both SDL3 and SDL2
 C APIs for video, rendering, audio, events, clipboard, timer, and a set of
@@ -657,4 +657,4 @@ session and are kept out of the default suite.
 
 ## Version
 
-**1.2.0** — See [CHANGELOG.md](docs/CHANGELOG.md).
+**1.3.1** — See [CHANGELOG.md](docs/CHANGELOG.md).

@@ -1,5 +1,18 @@
 # sdl changelog
 
+## 1.3.1 — 2026-09-17
+
+Avenys 4.x build-manifest migration.
+
+### Changed
+
+- `owl.toml` now declares the full Avenys 4.x build manifest: `artifact =
+  "shared"`, `runtime = "full"`, `target`, `panic = "abort"`, `incremental`,
+  `debug-info`, the expanded `[paths]` (`source`/`test`/`bin`/`generated`),
+  the `[cfg]` section (`publisher`, `registry`) and explicit `mire`/`kioto`
+  path dependencies alongside the `sdl` self-dependency.
+- `owl.lock` regenerated for the new dependency layout.
+
 ## 1.2.0 — 2026-08-03
 
 Struct helper module + convenience wrappers for rect/point/color operations.
