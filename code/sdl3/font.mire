@@ -23,8 +23,8 @@ extern fn SDL_UnlockTexture: (tex :i64) lib "SDL3"
 cons FONT_W = 5 :i64
 cons FONT_H = 7 :i64
 
-pub fn font_w: () :i64 { return 5 }
-pub fn font_h: () :i64 { return 7 }
+pub fn font_w: () :i64 { return FONT_W }
+pub fn font_h: () :i64 { return FONT_H }
 
 // ── Color ───────────────────────────────────────────────────────────
 // Encode RGBA as u32 (little-endian: R, G, B, A) — SDL3 RGBA8888.
@@ -123,9 +123,9 @@ cons EDGE_A = 160 :i64
 pub fn draw_char_to_buffer: (buf :i64, buf_w :i64, x :i64, y :i64, ch :i64, color :i64, scale :i64, clip_x :i64, clip_y :i64, clip_w :i64, clip_h :i64) {
     if buf == 0 || scale < 1 { return }
     set cc = 0 :i64 mut
-    while cc < 5 {
+    while cc < FONT_W {
         set rr = 0 :i64 mut
-        while rr < 7 {
+        while rr < FONT_H {
             if rt_font_get_pixel(ch, cc, rr) == 1 {
                 set bx = x + cc * scale :i64 mut
                 set by = y + rr * scale :i64 mut
@@ -141,7 +141,7 @@ pub fn draw_char_to_buffer: (buf :i64, buf_w :i64, x :i64, y :i64, ch :i64, colo
                             if sx == 0 && sy == 0 {
                                 rt_write_u32(buf + off, color)
                             } else {
-                                rt_blend_u32(buf + off, color, 160)
+                                rt_blend_u32(buf + off, color, EDGE_A)
                             }
                         }
                         set sy = sy + 1
