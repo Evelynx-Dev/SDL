@@ -180,9 +180,13 @@ pub fn clear: (rend :i64) :bool { return SDL_RenderClear(rend) }
 pub fn present: (rend :i64) :bool { return SDL_RenderPresent(rend) }
 
 pub fn fill_screen: (rend :i64, r :i64, g :i64, b :i64) :bool {
-    if SDL_SetRenderDrawColor(rend r g b 255) == 0 { return false }
-    if SDL_RenderClear(rend) == 0 { return false }
-    if SDL_RenderPresent(rend) == 0 { return false }
+    // SDL3 returns `true` on success, so the failure test is a plain negation.
+    // The SDL2 spelling of this function, `!= 0` against an `i64` return, does
+    // not carry over: these three are declared `:bool`, and `== 0` was a
+    // comparison of a bool with an integer, which is a type error.
+    if !SDL_SetRenderDrawColor(rend r g b 255) { return false }
+    if !SDL_RenderClear(rend) { return false }
+    if !SDL_RenderPresent(rend) { return false }
     return true
 }
 
